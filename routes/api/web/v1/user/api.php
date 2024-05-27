@@ -21,5 +21,12 @@ Route::middleware('auth:sanctum')->name("api.web.v1.user.")->group(function () {
     Route::get('salam/user', function (){
 //        auth()->user();
        return auth()->user();
-    })->name('amin');
+    })->name('amin')->middleware(['role:user']);
+
+    Route::group(['middleware' => ['role:user']], function() {
+        Route::get('/dsfsdddddd', function (){
+            return 'lakfd';
+        });
+//        Route::get('/manage', ['middleware' => ['permission:manage-admins'], 'uses' => 'AdminController@manageAdmins']);
+    });
 });
