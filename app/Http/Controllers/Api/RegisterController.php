@@ -19,46 +19,39 @@ class RegisterController
      */
     public function create(Request $request)
     {
-//        dd("register");
+
         info("App sign up " . serialize($request->all()));
 
         Validator::make($request->all(), [
-            'phone_number'=> ['required', 'string', 'max:11']
-//            'fname' => ['required', 'string', 'max:255'],
-//            'lname' => ['required', 'string', 'max:255'],
-//            'email' => [
-//                'required',
-//                'string',
-//                'email',
-//                'max:255',
-//                Rule::unique(User::class),
-//            ],
-//            'password' => $this->passwordRules(),
+            'phone_number' => ['required', 'string', 'max:11']
+            //            'fname' => ['required', 'string', 'max:255'],
+            //            'lname' => ['required', 'string', 'max:255'],
+            //            'email' => [
+            //                'required',
+            //                'string',
+            //                'email',
+            //                'max:255',
+            //                Rule::unique(User::class),
+            //            ],
+            //            'password' => $this->passwordRules(),
             //'password' => [Rule::requiredIf(array_key_exists($input), 'string', new Password, 'confirmed'],
         ])->validate();
 
         $user = User::where('phone_number', '=', $request['phone_number'])->first();
-        if ($user){
-            $role = $user->hasRole("user");
-        }else{
-            $user = User::create([
-                'phone_number' => $request['phone_number']
-                //            'fname' => $request['fname'],
-                //            'lname' => $request['lname'],
-                //            'email' => $request['email'],
-                //'email_verified_at' => Carbon::now(),
-                //            'password' => Hash::make($request['password']),
+        if ($user) {
+            return $user->update([
+                'verification_code'        => rand(100000, 999999),
+                'verification_code_expire' => Carbon::now()->addHour(intval(config("app.EXPIRATION_HOUR_VERIFICATION_CODE")))
             ]);
-            $user->addRole("user");
-            $role = true;
+        } else {
+            $user = User::create([
+                'phone_number'             => $request['phone_number'],
+                'verification_code'        => rand(100000, 999999),
+                'verification_code_expire' => Carbon::now()->addHour(intval(config("app.EXPIRATION_HOUR_VERIFICATION_CODE")))
+            ]);
+             $user->addRole("user");
+            return '1';
         }
 
-        $expiresAt = Carbon::now()->addDay(intval(config("app.EXPIRATION_DAY")));
-        $token = $user->createToken('auth-token', ['read', 'write'], $expiresAt)->plainTextToken;
-
-        return response()->json([
-            'token' => $token,
-            'role' => $role ? "user" : "admin"
-            ]);
     }
 }

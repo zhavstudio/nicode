@@ -132,6 +132,18 @@ return [
     | database based of the current date and time
     */
 
-    'EXPIRATION_DAY' => env('EXPIRATION_DAY', 15)
+    'EXPIRATION_DAY_TOKEN' => env('EXPIRATION_DAY_TOKEN', 15),
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Expiration Hour
+    |--------------------------------------------------------------------------
+    |
+    | This number shows the expiration Hour after the last use of the api token in the
+    | database based of the current date and time
+    */
+
+    'EXPIRATION_HOUR_VERIFICATION_CODE' => env('EXPIRATION_HOUR_VERIFICATION_CODE', 3)
 
 ];

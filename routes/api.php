@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\RegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,4 +20,6 @@ use Illuminate\Support\Facades\Route;
 Route::name("api.public.")->group(function () {
 
     Route::post("register", [RegisterController::class, 'create'])->name("register");
+
+    Route::post('verification-code', [LoginController::class, 'create'])->name('verification-code');
 });
