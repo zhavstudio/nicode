@@ -30,12 +30,6 @@ return [
 
     'disks' => [
 
-        'local' => [
-            'driver' => 'local',
-            'root' => storage_path('app'),
-            'throw' => false,
-        ],
-
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
@@ -43,6 +37,13 @@ return [
             'visibility' => 'public',
             'throw' => false,
         ],
+
+        'resource' => [
+            'driver' => 'local',
+            'root' => resource_path(),
+            'throw' => false,
+        ],
+
 
         's3' => [
             'driver' => 's3',

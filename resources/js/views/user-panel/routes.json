@@ -1,0 +1,8 @@
+{
+    "routes": {
+        "api.web.v1.user.amin": {
+            "uri": "api\/web\/v1\/user\/salam\/user",
+            "name": "api.web.v1.user.amin"
+        }
+    }
+}

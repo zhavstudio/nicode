@@ -123,4 +123,15 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Expiration days
+    |--------------------------------------------------------------------------
+    |
+    | This number shows the expiration day after the last use of the api token in the
+    | database based of the current date and time
+    */
+
+    'EXPIRATION_DAY' => env('EXPIRATION_DAY', 15)
+
 ];
