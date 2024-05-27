@@ -1,4 +1,4 @@
-import { Route, RouteComponentProps} from "react-router-dom";
+import {Redirect, Route, RouteComponentProps} from "react-router-dom";
 import React from "react";
 
 
@@ -9,7 +9,7 @@ interface Props {
     exact?: boolean;
 };
 const AuthRoute = ({ Component, path, exact = false }: Props): JSX.Element => {
-    const isAuthed = !!localStorage.getItem(ACCESS_TOKEN);
+    const isAuthed = false //!!localStorage.getItem(ACCESS_TOKEN);//
     const message = 'Please log in to view this page'
     return (
         <Route
