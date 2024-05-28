@@ -1,0 +1,8 @@
+@font-face {
+  font-family: 'Dana-Regular';
+  src: url(./Dana-Regular.eot);
+  src: url(./Dana-Regular.eot?#iefix) format('embedded-opentype'),
+       url(./Dana-Regular.ttf) format('truetype'),
+       url(./Dana-Regular.svg#Dana-Regular) format('svg'),
+       url(./Dana-Regular.otf) format('otf');
+}

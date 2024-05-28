@@ -1,0 +1,87 @@
+html, body, #root {
+    height: 100%;
+    margin: 0;
+}
+
+
+
+@font-face {
+    font-family: Iranian-sans;
+    src: url('./iransans/eot/Iranian-sans.eot'); /* IE9 Compat Modes */
+    src: url('./iransans/eot/Iranian-sans.eot?#iefix') format('embedded-opentype'), /* IE6-8 */
+    url('./iransans/woff2/Iranian-sans.woff2') format('woff2'), /* FF39+,Chrome36+, Opera24+*/
+    url('./iransans/woff/Iranian-sans.woff') format('woff'), /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+    url('./iransans/ttf/Iranian-sans.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('./iransans/svg/Iranian-sans.svg') format('svg'); /* Legacy iOS */
+}
+
+/*@font-face {*/
+/*    font-family: dana-regular;*/
+/*    src: url('./dana/eot/dana-regular.eot'); !* IE9 Compat Modes *!*/
+/*    src: url('./dana/eot/dana-regular.eot?#iefix') format('embedded-opentype'), !* IE6-8 *!*/
+/*    url('./dana/woff2/dana-regular.woff2') format('woff2'), !* FF39+,Chrome36+, Opera24+*!*/
+/*    url('./dana/woff/dana-regular.woff') format('woff'), !* FF3.6+, IE9, Chrome6+, Saf5.1+*!*/
+/*    url('./dana/ttf/dana-regular.ttf') format('truetype'), !* Safari, Android, iOS *!*/
+/*    url('./dana/svg/dana-regular.svg') format('svg'); !* Legacy iOS *!*/
+/*}*/
+
+/*Dana font*/
+@font-face {
+    font-family: Dana;
+    src: url("./Dana1/Webfonts/woff2/Dana-Regular.woff2");
+}
+@font-face {
+    font-family: Dana;
+    src: url("./Dana1/Webfonts/woff2/Dana-Bold.woff2");
+    font-weight: 500;
+}
+@font-face {
+    font-family: Dana;
+    src: url("./Dana1/Webfonts/woff2/Dana-Black.woff2");
+    font-weight: 100;
+}
+@font-face {
+    font-family: Dana;
+    src: url("./Dana1/Webfonts/woff2/Dana-ExtraBold.woff2");
+    font-weight: 900;
+}
+@font-face {
+    font-family: Dana;
+    src: url("./Dana1/Webfonts/woff2/Dana-DemiBold.woff2");
+    font-weight: 300;
+}
+.MuiOtpInput-TextField{
+    background-color: #F4F4F4;
+    /*border: none;*/
+}
+
+/*morabba font*/
+@font-face {
+    font-family: Morabba;
+    src: url("./morabba/ttf/Morabba-Regular.ttf");
+}
+@font-face {
+    font-family: Morabba;
+    src: url("./morabba/ttf/Morabba-SemiBold.ttf");
+    font-weight: 500;
+}
+@font-face {
+    font-family: Morabba;
+    src: url("./morabba/ttf/Morabba-Black.ttf");
+    font-weight: 100;
+}
+@font-face {
+    font-family: Morabba;
+    src: url("./morabba/ttf/Morabba-ExtraBold.ttf");
+    font-weight: 900;
+}
+@font-face {
+    font-family: Morabba;
+    src: url("./morabba/ttf/Morabba-Bold.ttf");
+    font-weight: 300;
+}
+
+
+body {
+    font-family: Dana, sans-serif;
+}
