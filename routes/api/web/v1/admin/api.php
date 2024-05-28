@@ -13,8 +13,9 @@ use Illuminate\Support\Facades\Route;
 */
 //Admin
 
+Route::name("api.web.v1.admin.")->group(function () {
 
-
-Route::middleware('auth:sanctum')->name("api.web.v1.admin.")->group(function () {
-
+    Route::get('admin/hi', function (){
+        return "salam admin";
+    });
 });

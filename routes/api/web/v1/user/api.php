@@ -14,19 +14,16 @@ use Illuminate\Support\Facades\Route;
 */
 //User
 
-
-
-Route::middleware('auth:sanctum')->name("api.web.v1.user.")->group(function () {
+Route::name("api.web.v1.user.")->group(function () {
 
     Route::get('salam/user', function (){
 //        auth()->user();
        return auth()->user();
-    })->name('amin')->middleware(['role:user']);
+    })->name('amin');
 
-    Route::group(['middleware' => ['role:user']], function() {
+
         Route::get('/dsfsdddddd', function (){
-            return 'lakfd';
+            return auth()->user();
         });
-//        Route::get('/manage', ['middleware' => ['permission:manage-admins'], 'uses' => 'AdminController@manageAdmins']);
-    });
+
 });

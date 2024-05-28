@@ -10,6 +10,18 @@ use Laratrust\Contracts\LaratrustUser;
 use Laratrust\Traits\HasRolesAndPermissions;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @property numeric $id
+ * @property string  $first_name
+ * @property string  $last_name
+ * @property string  $email
+ * @property string  $email_verified_at
+ * @property string  $phone
+ * @property string  $phone_verified_at
+ * @property string  $verification_code
+ * @property string  $verification_code_expire
+ * @property string  $password
+ */
 class User extends Authenticatable implements LaratrustUser
 {
     use HasFactory, Notifiable, HasRolesAndPermissions, HasApiTokens;

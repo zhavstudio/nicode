@@ -15,7 +15,7 @@ class RegisterController
     /**
      * Show the form for creating a new resource.
      *
-     * @return JsonResponse
+     * @return string
      */
     public function create(Request $request)
     {
