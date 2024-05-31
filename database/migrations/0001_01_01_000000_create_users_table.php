@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserGenderEnum;
 use App\Enums\UserStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
+            $table->tinyInteger('gender')->default(UserGenderEnum::male);
+            $table->string('code_meli')->unique()->nullable();
             $table->string('email')->unique()->nullable();
             $table->string('phone_number')->unique();
             $table->integer('verification_code')->nullable();
