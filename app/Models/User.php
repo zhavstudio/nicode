@@ -2,14 +2,31 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserGenderEnum;
+use App\Enums\UserStatusEnum;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laratrust\Contracts\LaratrustUser;
 use Laratrust\Traits\HasRolesAndPermissions;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @property numeric $id
+ * @property numeric $gender
+ * @property numeric $status
+ * @property string  $first_name
+ * @property string  $last_name
+ * @property string  $email
+ * @property string  $email_verified_at
+ * @property string  $phone
+ * @property string  $phone_verified_at
+ * @property string  $verification_code
+ * @property string  $verification_code_expire
+ * @property string  $password
+ */
 class User extends Authenticatable implements LaratrustUser
 {
     use HasFactory, Notifiable, HasRolesAndPermissions, HasApiTokens;
@@ -22,6 +39,8 @@ class User extends Authenticatable implements LaratrustUser
     protected $fillable = [
         'firs_name',
         'last_name',
+        'gender',
+        'code_meli',
         'phone_number',
         'verification_code',
         'verification_code_expire',
@@ -49,8 +68,64 @@ class User extends Authenticatable implements LaratrustUser
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'email_verified_at'        => 'datetime',
+            'password'                 => 'hashed',
+            'firs_name'                => 'string',
+            'last_name'                => 'string',
+            'gender'                   => UserGenderEnum::class,
+            'code_meli'                => 'string',
+            'phone_number'             => 'string',
+            'verification_code'        => 'integer',
+            'verification_code_expire' => 'datetime',
+            'phone_number_verified_at' => 'datetime',
+            'status'                   => UserStatusEnum::class,
+            'email'                    => 'string',
         ];
+    }
+
+    /**
+     * Interact with the user's first name.
+     *
+     * @return Attribute
+     */
+    protected function firstname(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => ucfirst($value),
+            set: fn($value) => strtolower(trim($value))
+        );
+    }
+
+    /**
+     * Interact with the user's last name.
+     *
+     * @return Attribute
+     */
+    protected function lastname(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => ucfirst($value),
+            set: fn($value) => strtolower(trim($value)),
+        );
+    }
+
+    /**
+     * create a virtual column name from first_name and last_name
+     *
+     * @return Attribute
+     */
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn(mixed $value, array $attributes) => ucfirst($attributes['first_name']) . " " . ucfirst($attributes['last_name']),
+        );
+    }
+
+    /**
+     * Get the profile's image for this user
+     */
+    public function profileImage(): File|MorphOne|null
+    {
+        return $this->morphOne(File::class, 'parentable')->where('image_type', '=', 'profile',);
     }
 }

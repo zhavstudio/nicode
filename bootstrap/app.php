@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Middleware\UserStatusCheck;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Laratrust\Middleware\Role;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
 
@@ -16,15 +18,18 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
+
         $middleware->use([
-//            'role' => \Laratrust\Middleware\Role::class,
+//            'test' => \App\Http\Middleware\Test::class,
 //            'permission' => \Laratrust\Middleware\Permission::class,
 //            'ability' => \Laratrust\Middleware\Ability::class,
         ]);
 
         $middleware->alias([
-            'abilities' => CheckAbilities::class,
-            'ability' => CheckForAnyAbility::class,
+            'user_status' => UserStatusCheck::class,
+            'role'        => Role::class,
+            'abilities'   => CheckAbilities::class,
+            'ability'     => CheckForAnyAbility::class,
         ]);
 
     })
