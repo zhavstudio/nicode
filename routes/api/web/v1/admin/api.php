@@ -1,4 +1,6 @@
 <?php
+
+use App\Http\Controllers\Api\MessageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,5 +18,8 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::middleware('auth:sanctum')->name("api.web.v1.admin.")->group(function () {
-
+    Route::get('/messages', [MessageController::class, 'messages'])
+        ->name('messages');
+    Route::post('/message', [MessageController::class, 'message'])
+        ->name('message');
 });

@@ -5,6 +5,7 @@ const customTheme = createTheme({
         Primary:{
             main:'#4162FF',
             10 : '#F4F4F4',
+            20 : "#E9E9E9"
         },
         Secondary:{
             main:'#593188',

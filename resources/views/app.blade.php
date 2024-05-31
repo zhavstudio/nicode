@@ -8,6 +8,7 @@
     <title>Laravel</title>
 </head>
 <body>
+@csrf
 <div id="app" ></div>
 
 @viteReactRefresh

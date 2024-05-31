@@ -19,7 +19,6 @@ class RegisterController
      */
     public function create(Request $request)
     {
-
         info("App sign up " . serialize($request->all()));
 
         Validator::make($request->all(), [

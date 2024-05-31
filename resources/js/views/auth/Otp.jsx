@@ -4,16 +4,44 @@ import theme from "./../../Custom"
 import logo from "./../../assets/logo.svg"
 import { MuiOtpInput } from 'mui-one-time-password-input'
 import {Link} from "react-router-dom";
+import {useMutation} from "react-query";
+import axios from './../../axiosConfig';
+import {route} from './helpers'
 
 
 
 export default function Otp() {
 
     const [otp, setOtp] = React.useState('')
+    const [disable,setDisable] = React.useState(true)
 
     const handleChange = (newValue) => {
         setOtp(newValue)
     }
+
+
+    const login = useMutation(async (data) => {
+            const response = await axios.post(route("api.public.verification-code"),data);
+            return response.data;
+        }, {
+            onSuccess: (data) => {
+                localStorage.setItem("token",data.token)
+                localStorage.setItem("role",data.role)
+            },
+            onError: () => {
+            },
+            onSettled: () => {
+            },
+        }
+    )
+
+    const phone = localStorage.getItem("phone")
+
+    const handleOtp = (newValue) =>{
+        login.mutate({verification_code:newValue,phone_number:phone})
+        setDisable(false)
+    }
+
 
 
     return (
@@ -64,10 +92,9 @@ export default function Otp() {
                         </Typography>
                     </ListItem>
                 </List>
-                <MuiOtpInput marginY='30px' display='flex' length={5} width={{xs:'90%',md:'50%'}} value={otp} onChange={handleChange} />
-                <Link to={'/panel'} style={{ textDecoration: 'none' ,width:'50%'}}>
+                <MuiOtpInput marginY='30px' display='flex' length={6} width={{xs:'90%',md:'50%'}} value={otp} onComplete={handleOtp} onChange={handleChange} />
                 <Button
-                    onClick={()=>window.dispatchEvent(new Event('auth'))}
+                    disabled={disable}
                     variant='contained'
                     sx={{
                         width:'50%',
@@ -76,9 +103,10 @@ export default function Otp() {
                         borderRadius:'100px'
                     }}
                 >
+                    <Link to={'/panel'} style={{ textDecoration: 'none' ,width:'50%'}}>
                     بررسی و ورود
+                    </Link>
                 </Button>
-                </Link>
             </Grid>
         </Grid>
     )

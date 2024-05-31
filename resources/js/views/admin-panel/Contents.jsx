@@ -1,9 +1,9 @@
 import * as React from "react";
 import {Route, Routes} from "react-router-dom";
-import Login from "./Login.jsx";
-import Otp from "./Otp.jsx";
-import Panel from "./../AdminPanel/Panel"
-import Ticket from "../AdminPanel/Ticket.jsx";
+import Ticket from "./Ticket";
+import Financial from "./Financial";
+import TicketChat from "./TicketChat";
+
 
 
 
@@ -14,11 +14,10 @@ export default function Contents() {
     return (
         <>
             <Routes>
-                    {/*<Route path="/" element={<Login/>}/>*/}
-                    {/*<Route path="/otp" element={<Otp/>}/>*/}
-                    <Route path="admin-panel" >
-                        <Route path="" element={<Panel/>}/>
+                    <Route path="" >
                         <Route path="ticket" element={<Ticket/>}/>
+                        <Route path="chat" element={<TicketChat/>}/>
+                        <Route path="financial" element={<Financial/>}/>
                     </Route>
             </Routes>
         </>
