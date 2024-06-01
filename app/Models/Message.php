@@ -28,7 +28,7 @@ class Message extends Model
      *
      * @var bool
      */
-    public $timestamps = false;
+    public $timestamps = true;
     /**
      * The attributes that are mass assignable.
      *
@@ -58,8 +58,23 @@ class Message extends Model
     /**
      * Get the language that owns this skill.
      */
-    public function users(): BelongsToMany
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsToMany(User::class, 'user_agreements', 'user_id', 'agreement_id');
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimeAttribute(): string {
+        return date(
+            "d M Y, H:i:s",
+            strtotime($this->attributes['created_at'])
+        );
+    }
+
+    public function ticket()
+    {
+        return $this->belongsTo(Ticket::class);
     }
 }

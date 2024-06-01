@@ -128,4 +128,9 @@ class User extends Authenticatable implements LaratrustUser
     {
         return $this->morphOne(File::class, 'parentable')->where('image_type', '=', 'profile',);
     }
+
+    public function message()
+    {
+        return $this->hasMany(Message::class);
+    }
 }

@@ -18,9 +18,10 @@ use Illuminate\Support\Facades\Route;
 Route::name("api.web.v1.admin.")->group(function () {
 
 
-Route::middleware('auth:sanctum')->name("api.web.v1.admin.")->group(function () {
-    Route::get('/messages', [MessageController::class, 'messages'])
-        ->name('messages');
-    Route::post('/message', [MessageController::class, 'message'])
-        ->name('message');
+    Route::middleware('auth:sanctum')->name("api.web.v1.admin.")->group(function () {
+        Route::get('/messages', [MessageController::class, 'messages'])
+            ->name('messages');
+        Route::post('/message', [MessageController::class, 'message'])
+            ->name('message');
+    });
 });

@@ -16,7 +16,9 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $this->call([
-            LaratrustSeeder::class
+            LaratrustSeeder::class,
+            UserSeeder::class,
+            TicketSeeder::class
         ]);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\MessageRequest;
+use App\Http\Resources\MessagesResource;
 use App\Jobs\SendMessage;
 use App\Models\Message;
 use Illuminate\Http\JsonResponse;
@@ -65,13 +67,13 @@ class MessageController
         //
     }
 
-    public function messages(): JsonResponse {
+    public function messages(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    {
         $messages = Message::with('user')->get()->append('time');
-        dd($messages);
-        return response()->json($messages);
+        return MessagesResource::collection($messages);
     }
 
-    public function message(Request $request): JsonResponse {
+    public function message(MessageRequest $request): JsonResponse {
         $message = Message::create([
             'user_id' => auth()->id(),
             'text' => $request->get('text'),

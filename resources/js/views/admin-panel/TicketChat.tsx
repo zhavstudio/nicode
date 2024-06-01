@@ -40,15 +40,14 @@ export default function TicketChat(){
         }
     )
 
-    //
-    // const Messages = useQuery("Messages", async () => {
-    //     const { data } = await axios.get(
-    //         route("api.web.v1.admin.messages")
-    //     );
-    //     Messages.data = data.data;
-    //     return Messages;
-    // },{refetchInterval:3000});
 
+    const Messages = useQuery("Messages", async () => {
+        const { data } = await axios.get(
+            route("api.web.v1.admin.messages")
+        );
+        Messages.data = data.data;
+        return Messages;
+    },{refetchInterval:3000});
 
     return(
         <Box position="fixed" dir="rtl" display="flex" justifyContent="center" alignItems="center" height="100vh"   sx={{
@@ -66,42 +65,52 @@ export default function TicketChat(){
              </Box>
              <Divider sx={{mt:"10px"}}/>
             <Box display="flex" flexDirection="row" width="100%">
-                <Box width="70%" display="flex" justifyContent="flex-end" flexDirection='column'>
-                    <Typography fontWeight="900">                    اين تايتل فقط نمايشي است براي تيكت زدن در سايت
-                    </Typography>
-                    <Typography>آخرین آپدیت در 28/7/1402</Typography>
-                    <Box display="flex" flexDirection="colomn" gap={1}>
-                        <Avatar>
-
-                        </Avatar>
-                        <Typography bgcolor={theme.palette.Primary[20]} borderRadius="20px" maxWidth="50%" p={2}>
-                            لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز
+                <Box sx={{ height: '400px', overflowY: 'auto' }}>
+                    <Box width="70%" display="flex" justifyContent="flex-end" flexDirection="column">
+                        <Typography fontWeight="900">
+                            اين تايتل فقط نمايشي است براي تيكت زدن در سايت
                         </Typography>
-                    </Box>
-                    <TextField
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    border: 'none',
+                        <Typography>آخرین آپدیت در 28/7/1402</Typography>
+                        {Messages?.data?.data.map((item, index) => (
+                            <Box display="flex" flexDirection="column" gap={1} key={index}>
+                                <Avatar></Avatar>
+                                <Typography
+                                    bgcolor={theme.palette.Primary[20]}
+                                    borderRadius="20px"
+                                    maxWidth="50%"
+                                    p={2}
+                                >
+                                    {item.text}
+                                </Typography>
+                            </Box>
+                        ))}
+                        <TextField
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                        border: 'none',
+                                    },
+                                    mt: 2,
+                                    pl: 5,
                                 },
-                                mt: 2,
-                                pl: 5,
-                            },
-                        }}
-                        inputProps={{
-                            sx: { backgroundColor: "#F4F4F4", borderRadius: '20px' },
-                        }}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment onClick={()=>sendMessage.mutate({message:"asfafafafsdf"})} position="end">
-                                    <IconButton>
-                                        <SendIcon />
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                    >
-                    </TextField>
+                            }}
+                            inputProps={{
+                                sx: { backgroundColor: "#F4F4F4", borderRadius: '20px' },
+                            }}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment
+                                        onClick={() => sendMessage.mutate({ text: "asfafafafsdf" })}
+                                        position="end"
+                                    >
+                                        <IconButton>
+                                            <SendIcon />
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                        ></TextField>
+                    </Box>
                 </Box>
                 <Box width="30%" display="flex" justifyContent="flex-end" flexDirection='column'>
                     <Typography fontWeight="900" mt={2}>جزییات</Typography>
