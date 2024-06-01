@@ -1,4 +1,6 @@
 <?php
+
+use App\Http\Controllers\Api\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,4 +20,7 @@ Route::name("api.web.v1.admin.")->group(function () {
     Route::get('admin/hi', function (){
         return "salam admin";
     });
+
+    Route::apiResource('user', UserController::class)->only(['index', 'store']);
+
 });

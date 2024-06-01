@@ -46,14 +46,14 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapUserPanelRoutes(): void
     {
         Route::prefix('api/web/v1/user')
-            ->middleware(['api', 'user_status', 'auth:sanctum', 'role:user'])
+            ->middleware(['api', 'auth:sanctum', 'role:user', 'user_status'])
             ->namespace($this->namespace)
             ->group(base_path('routes/api/web/v1/user/api.php'));
     }
     protected function mapAdminPanelRoutes(): void
     {
         Route::prefix('api/web/v1/admin')
-            ->middleware(['api', 'user_status', 'auth:sanctum', 'role:admin'])
+            ->middleware(['api', 'auth:sanctum', 'role:admin', 'user_status'])
             ->namespace($this->namespace)
             ->group(base_path('routes/api/web/v1/admin/api.php'));
     }
