@@ -4,19 +4,35 @@ import theme from "./../../Custom"
 import logo from "./../../assets/logo.svg"
 import {Link} from "react-router-dom";
 import {useState} from "react";
+import axios from './../../axiosConfig';
+import {useMutation, useQuery} from "react-query";
+import {route} from './helpers'
 
 
 export default function Login() {
 
     const [phoneNumber, setPhoneNumber] = useState('');
-
     const handlePhoneNumberChange = (event) => {
         const value = event.target.value;
-        // Add any additional validation or formatting logic here
         setPhoneNumber(value);
     };
 
-    const isButtonDisabled = phoneNumber.length < 11;
+    localStorage.setItem("phone",phoneNumber)
+
+    const isButtonDisabled = phoneNumber.length !== 11 ;
+
+    const register = useMutation(async (phone_number) => {
+            const response = await axios.post(route("api.public.register"),phone_number);
+            return response.data;
+        }, {
+            onSuccess: (data) => {
+            },
+            onError: () => {
+            },
+            onSettled: () => {
+            },
+        }
+    )
 
 
     return (
@@ -80,6 +96,7 @@ export default function Login() {
                     onChange={handlePhoneNumberChange}
                 />
                     <Button
+                        onClick={()=>register.mutate({phone_number:phoneNumber})}
                         variant="contained"
                         sx={{
                             width: '50%',

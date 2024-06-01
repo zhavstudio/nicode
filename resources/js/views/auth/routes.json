@@ -1,0 +1,12 @@
+{
+    "routes": {
+        "api.public.register": {
+            "uri": "api\/register",
+            "name": "api.public.register"
+        },
+        "api.public.verification-code": {
+            "uri": "api\/verification-code",
+            "name": "api.public.verification-code"
+        }
+    }
+}

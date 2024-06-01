@@ -1,14 +1,15 @@
 import React from 'react'
 import Contents from './Contents'
+import Panel from "./Panel";
 
 
 
 export default function App(){
     console.log("admin panel")
     return(
-        // <Contents/>
-        <h1>
-            Admin Panel
-        </h1>
+        <>
+        <Contents/>
+            <Panel/>
+        </>
     )
 }
