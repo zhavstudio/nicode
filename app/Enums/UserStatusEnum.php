@@ -17,8 +17,8 @@ final class UserStatusEnum extends Enum
     public static function getDescription(mixed $value): string
     {
         return match ($value) {
-            self::suspend => 'Suspend',
-            self::active => 'Active',
+            self::suspend => 'معلق',
+            self::active => 'فعال',
             default => self::getKey($value),
         };
     }

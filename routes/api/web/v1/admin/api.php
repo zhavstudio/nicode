@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\UserController;
+
 use App\Http\Controllers\Api\MessageController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +18,9 @@ use Illuminate\Support\Facades\Route;
 //Admin
 
 Route::name("api.web.v1.admin.")->group(function () {
+
+    Route::apiResource('user', UserController::class)->only(['index', 'store']);
+
 
 
     Route::middleware('auth:sanctum')->name("api.web.v1.admin.")->group(function () {

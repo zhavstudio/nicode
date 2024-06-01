@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\UserGenderEnum;
 use App\Enums\UserStatusEnum;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -29,7 +30,7 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class User extends Authenticatable implements LaratrustUser
 {
-    use HasFactory, Notifiable, HasRolesAndPermissions, HasApiTokens;
+    use HasFactory, Notifiable, HasRolesAndPermissions, HasApiTokens, HasUlids;
 
     /**
      * The attributes that are mass assignable.
