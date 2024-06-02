@@ -3,7 +3,6 @@ import {Route, Routes} from "react-router-dom";
 import Ticket from "./Ticket";
 import Financial from "./Financial";
 import TicketChat from "./TicketChat";
-import Users from "./Users";
 
 
 
@@ -20,7 +19,6 @@ export default function Contents() {
                         <Route path="chat/:id" element={<TicketChat/>}/>
                         <Route path="financial" element={<Financial/>}/>
                         <Route path="account_info" element={<Financial/>}/>
-                        <Route path="users" element={<Users/>}/>
                     </Route>
             </Routes>
         </>

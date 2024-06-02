@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Admin\UserController;
 
 use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\TicketController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,12 +22,11 @@ Route::name("api.web.v1.admin.")->group(function () {
 
     Route::apiResource('user', UserController::class)->only(['index', 'store']);
 
+    Route::apiResource("ticket", TicketController::class)->only("index","store");
 
+    Route::get('/messages/{ticket}', [MessageController::class, 'messages'])
+        ->name('messages');
+    Route::post('/message/{ticket}', [MessageController::class, 'message'])
+        ->name('message');
 
-    Route::middleware('auth:sanctum')->name("api.web.v1.admin.")->group(function () {
-        Route::get('/messages', [MessageController::class, 'messages'])
-            ->name('messages');
-        Route::post('/message', [MessageController::class, 'message'])
-            ->name('message');
-    });
 });

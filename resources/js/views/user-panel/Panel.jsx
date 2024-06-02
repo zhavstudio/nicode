@@ -41,7 +41,7 @@ const drawerItems = [
     {
         id: 1,
         name: "کاربران",
-        route: "/panel/users",
+        route: "/panel/ticket",
         icon: <DashboardOutlinedIcon/>,
         hasChildren: false,
     },
@@ -54,7 +54,7 @@ const drawerItems = [
     },
     {
         id: 6,
-        name: "تراکنشات",
+        name: "امور مالی",
         route: "/panel/financial",
         icon: <DnsOutlinedIcon/>,
         hasChildren: false,

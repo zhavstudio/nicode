@@ -55,23 +55,14 @@ class Message extends Model
         "created_at" => "datetime",
     ];
 
-    /**
-     * Get the language that owns this skill.
-     */
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
+//    /**
+//     * Get the language that owns this skill.
+//     */
+//    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+//    {
+//        return $this->belongsTo(User::class);
+//    }
 
-    /**
-     * @return string
-     */
-    public function getTimeAttribute(): string {
-        return date(
-            "d M Y, H:i:s",
-            strtotime($this->attributes['created_at'])
-        );
-    }
 
     public function ticket()
     {

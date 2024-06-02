@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
+use App\Http\Resources\UserTicketResource;
 use App\Models\Ticket;
 
 class TicketController
@@ -13,7 +14,7 @@ class TicketController
      */
     public function index()
     {
-        //
+        return UserTicketResource::collection(auth()->user()->ticket()->get()->merge(auth()->user()->ticketAssigned()->get()));
     }
 
     /**

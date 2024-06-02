@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Morilog\Jalali\CalendarUtils;
 
-class MessagesResource extends JsonResource
+class UserTicketResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +16,14 @@ class MessagesResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            "text"     =>   $this->text,
+            "id"         => $this->id,
+            "title"      => $this->title,
+            "priority"   => $this->priority->description,
+            "status"     => $this->status->description,
+            "rate"       => $this->rete,
+            "feedback"   => $this->feedback,
+            "created_at" => CalendarUtils::strftime('Y-m-d', strtotime($this->created_at)),
             "updated_at" => CalendarUtils::strftime('Y-m-d', strtotime($this->updated_at)),
-            "id"       =>  $this->id,
-            "is_sender"  =>  $this->user_id === auth()->user()->id,
         ];
     }
 }

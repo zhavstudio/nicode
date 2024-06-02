@@ -6,8 +6,11 @@ use App\Http\Requests\MessageRequest;
 use App\Http\Resources\MessagesResource;
 use App\Jobs\SendMessage;
 use App\Models\Message;
+use App\Models\Ticket;
+use App\Models\TicketRecord;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Morilog\Jalali\CalendarUtils;
 
 class MessageController
 {
@@ -67,18 +70,27 @@ class MessageController
         //
     }
 
-    public function messages(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function messages(Ticket $ticket): array
     {
-        $messages = Message::with('user')->get()->append('time');
-        return MessagesResource::collection($messages);
+
+        $ticketTitle = $ticket->title;
+        $update = $ticket->updated_at;
+        $messages = MessagesResource::collection($ticket->messages()->get());
+
+        return [
+            'update'    => CalendarUtils::strftime('Y-m-d', strtotime($update)),
+            'ticket_title' => $ticketTitle,
+            'messages' => $messages,
+        ];
     }
 
-    public function message(MessageRequest $request): JsonResponse {
-        $message = Message::create([
-            'user_id' => auth()->id(),
-            'text' => $request->get('text'),
-        ]);
-        SendMessage::dispatch($message);
+    public function message(MessageRequest $request,Ticket $ticket): JsonResponse {
+
+        $ticketRecord = new Message($request->validated());
+        $ticketRecord->ticket()->associate($ticket);
+        $ticketRecord->user_id = auth()->user()->id;
+        $ticketRecord->save();
+        SendMessage::dispatch($ticketRecord);
 
         return response()->json([
             'success' => true,
