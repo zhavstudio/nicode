@@ -1,7 +1,7 @@
 import axios from 'axios';
 // console.log(import.meta.env.VITE_APP_URL);
 console.log(document.head.querySelector('meta[name="csrf-token"]').getAttribute("content"))
-
+console.log(localStorage.getItem('token'))
 const instance = axios.create({
     baseURL: import.meta.env.VITE_APP_URL,
     withCredentials: true,

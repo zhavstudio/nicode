@@ -3,7 +3,9 @@ import {Route, Routes} from "react-router-dom";
 import Ticket from "./Ticket";
 import Financial from "./Financial";
 import TicketChat from "./TicketChat";
-import Users from "./Users";
+import Users from "./Users/Users.jsx";
+import UsersDetails from "./Users/UsersDetails.jsx";
+import AllTransactions from "@/views/admin-panel/AllTransactions.jsx";
 
 
 
@@ -18,9 +20,10 @@ export default function Contents() {
                     <Route path="" >
                         <Route path="ticket" element={<Ticket/>}/>
                         <Route path="chat/:id" element={<TicketChat/>}/>
-                        <Route path="financial" element={<Financial/>}/>
+                        <Route path="financial" element={<AllTransactions/>}/>
                         <Route path="account_info" element={<Financial/>}/>
                         <Route path="users" element={<Users/>}/>
+                        <Route path="users/:id" element={<UsersDetails/>}/>
                     </Route>
             </Routes>
         </>

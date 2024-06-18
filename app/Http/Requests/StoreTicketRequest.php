@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\TicketPriorityStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTicketRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class StoreTicketRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +24,8 @@ class StoreTicketRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "title"     =>  ["required", "min:3", "max:150"],
+            "message"   =>  ["required", "min:5", "max:450"],
         ];
     }
 }

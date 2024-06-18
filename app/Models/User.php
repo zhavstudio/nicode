@@ -147,4 +147,9 @@ class User extends Authenticatable implements LaratrustUser
     {
         return $this->hasMany(Ticket::class,"assigned_id");
     }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
 }

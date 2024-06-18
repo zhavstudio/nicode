@@ -51,7 +51,7 @@ return [
     */
 
     'channels' => [
-
+        env('APP_LOG_CHANNEL', 'stack'),
         'stack' => [
             'driver' => 'stack',
             'channels' => explode(',', env('LOG_STACK', 'single')),

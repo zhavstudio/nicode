@@ -1,32 +1,36 @@
 import './bootstrap';
-import React, {useEffect, useState} from 'react';
-import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './views/auth/Login';
 import Otp from './views/auth/Otp';
 import Panel from './views/user-panel/App';
 import AdminPanel from './views/admin-panel/App';
-import {QueryClient, QueryClientProvider} from "react-query";
-import {ReactQueryDevtools} from "react-query/devtools";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 import "./assets/app.css"
-import {ThemeProvider} from "@mui/material";
+import { ThemeProvider } from "@mui/material";
 import theme from "./Custom"
-
-
-
-console.log("Hi app")
-
+import {useSelector} from "react-redux";
 
 const App = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('token') !== null);
-    const [userRole, setUserRole] = useState(localStorage.getItem('role'));
+    const auth1 = useSelector((state) => state.information.isAuthenticated);
+
+    const [isAuthenticated, setIsAuthenticated] = useState(auth1);
+    const [userRole, setUserRole] = useState('');
+    const [loading, setLoading] = useState(true);
+
+
 
     useEffect(() => {
         const auth = localStorage.getItem('token');
         const role = localStorage.getItem('role');
-
+        console.log(auth !== null)
         setIsAuthenticated(auth !== null);
-        setUserRole(role);
-    }, [isAuthenticated]);
+        setUserRole(role || '');
+        setLoading(false);
+    }, [auth1]);
+    console.log(isAuthenticated)
+
     console.log("app.tsx")
     const queryClient = new QueryClient({
         defaultOptions: {
@@ -43,27 +47,27 @@ const App = () => {
     return (
         <QueryClientProvider client={queryClient}>
             <ThemeProvider theme={theme}>
-            <Router>
-                <Routes>
-                    <Route path="/" element={<Login/>}/>
-                    <Route path="/otp" element={<Otp/>}/>
-                    <Route
-                        path="/panel/*"
-                        element={
-                            isAuthenticated ? (
-                                userRole === 'admin' ? (
-                                    <AdminPanel/>
+                <Router>
+                    <Routes>
+                        <Route path="/" element={<Login />} />
+                        <Route path="/otp" element={<Otp />} />
+                        <Route
+                            path="/panel/*"
+                            element={
+                                isAuthenticated ? (
+                                    userRole === 'admin' ? (
+                                        <AdminPanel />
+                                    ) : (
+                                        <Panel />
+                                    )
                                 ) : (
-                                    <Panel/>
+                                    <Navigate to="/" replace />
                                 )
-                            ) : (
-                                <Navigate to="/" replace/>
-                            )
-                        }
-                    />
-                    <Route path="*" element={<Navigate to={isAuthenticated ? '/panel' : '/login'} replace/>}/>
-                </Routes>
-            </Router>
+                            }
+                        />
+                        <Route path="*" element={<Navigate to={auth1 ? '/panel' : '/'} replace />} />
+                    </Routes>
+                </Router>
             </ThemeProvider>
         </QueryClientProvider>
     );

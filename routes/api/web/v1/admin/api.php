@@ -26,7 +26,9 @@ Route::name("api.web.v1.admin.")->group(function () {
 
     Route::get('/messages/{ticket}', [MessageController::class, 'messages'])
         ->name('messages');
+
     Route::post('/message/{ticket}', [MessageController::class, 'message'])
         ->name('message');
 
+    Route::get('user-details/{id}',[UserController::class,'details'])->name('details');
 });

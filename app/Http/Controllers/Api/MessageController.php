@@ -90,7 +90,7 @@ class MessageController
         $ticketRecord->ticket()->associate($ticket);
         $ticketRecord->user_id = auth()->user()->id;
         $ticketRecord->save();
-        SendMessage::dispatch($ticketRecord);
+        SendMessage::dispatch($ticketRecord,auth()->id());
 
         return response()->json([
             'success' => true,

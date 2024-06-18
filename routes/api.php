@@ -19,6 +19,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::name("api.public.")->group(function () {
 
+    Route::get('/hi', function () {
+        return dd();
+    });
+
+
     Route::post("register", [RegisterController::class, 'create'])->name("register");
 
     Route::post('verification-code', [LoginController::class, 'create'])->name('verification-code');

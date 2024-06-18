@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Requests\Api\Admin\UserRequest;
 use App\Http\Resources\Api\Admin\UserResource;
+use App\Http\Resources\UserDetailsResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -31,9 +32,10 @@ class UserController
     public function store(UserRequest $request)
     {
         $validated = $request->validated();
-//        dd($validated);
         $user = new User($validated);
-        return $user->save();
+        $user->save();
+        $user->addRole("user");
+        return response("user saved");
     }
 
     /**
@@ -66,5 +68,13 @@ class UserController
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function details(User $id)
+    {
+        return UserDetailsResource::make($id);
     }
 }

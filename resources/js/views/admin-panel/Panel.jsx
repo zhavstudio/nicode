@@ -1,40 +1,26 @@
 import * as React from 'react';
-import {styled, useTheme} from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-// import MuiAppBar, {AppBarProps as MuiAppBarProps} from '@mui/material/AppBar';
-// import Toolbar from '@mui/material/Toolbar';
 import CssBaseline from '@mui/material/CssBaseline';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
-// import Divider from '@mui/material/Divider';
-// import IconButton from '@mui/material/IconButton';
-// import MenuIcon from '@mui/icons-material/Menu';
-// import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-// import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
-import {Avatar, BottomNavigation, BottomNavigationAction} from "@mui/material";
 import theme from "./../../Custom"
-// import logo from './assets/zhav-new.png'
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
 import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
-import WebAssetOutlinedIcon from '@mui/icons-material/WebAssetOutlined';
-import CoPresentOutlinedIcon from '@mui/icons-material/CoPresentOutlined';
-import LocalAtmOutlinedIcon from '@mui/icons-material/LocalAtmOutlined';
-import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined';
 import AppBar from '@mui/material/AppBar';
-import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import {Link} from "react-router-dom";
 import logo from './../../assets/logo.svg'
+import LogoutIcon from '@mui/icons-material/Logout';
 
 
 const drawerItems = [
@@ -57,6 +43,13 @@ const drawerItems = [
         name: "تراکنشات",
         route: "/panel/financial",
         icon: <DnsOutlinedIcon/>,
+        hasChildren: false,
+    },
+    {
+        id: 7,
+        name: "خروج",
+        route: "/logout",
+        icon: <LogoutIcon />,
         hasChildren: false,
     },
 ];
@@ -96,7 +89,16 @@ export default function Panel(props) {
             {/*<Divider />*/}
             <List>
                 {drawerItems.map((text, index) => (
-                    <Link to={text.route} style={{textDecoration: 'none'}}>
+                    <Link to={text.route} style={{textDecoration: 'none'}}
+                          onClick={() => {
+                              if (text.route === "/logout") {
+                                  // Remove the token from local storage
+                                  localStorage.removeItem("token");
+                                  // Optionally, you can redirect the user to the login page
+                                  window.location.href = "/";
+                              }
+                          }}
+                    >
                         <ListItem key={text.name} disablePadding>
                             <ListItemButton sx={{display: 'flex', flexDirection: "column", alignItems: 'center'}}
                                             onClick={() => setAppBar(text.name)}>

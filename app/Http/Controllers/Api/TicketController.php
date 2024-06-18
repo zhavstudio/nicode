@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
 use App\Http\Resources\UserTicketResource;
+use App\Jobs\SendMessage;
+use App\Models\Message;
 use App\Models\Ticket;
 
 class TicketController
@@ -30,7 +32,20 @@ class TicketController
      */
     public function store(StoreTicketRequest $request)
     {
-        //
+        $ticketObj = new Ticket($request->validated());
+        $ticketObj->user()->associate(auth()->user());
+        $ticketObj->save();
+
+        $ticketRecord = new Message(["text" => $request->validated("message")]);
+        $ticketRecord->ticket()->associate($ticketObj);
+        $ticketRecord->user_id = auth()->user()->id;
+        $ticketRecord->save();
+        SendMessage::dispatch($ticketRecord);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Message created and job dispatched.",
+        ]);
     }
 
     /**
@@ -64,4 +79,13 @@ class TicketController
     {
         //
     }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function userTicket()
+    {
+        return UserTicketResource::collection(auth()->user()->ticket()->get());
+    }
+
 }

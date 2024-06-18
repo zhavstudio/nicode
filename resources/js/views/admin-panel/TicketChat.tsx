@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {
     Avatar,
     Box,
@@ -25,6 +25,7 @@ export default function TicketChat(){
 
     const [age, setAge] = React.useState('');
     const [inputValue, setInputValue] = useState('');
+    const [chat, setChat] = React.useState([]);
     const params = useParams();
     const chatBoxRef = useRef(null);
 
@@ -47,7 +48,7 @@ export default function TicketChat(){
             return response.data;
         }, {
             onSuccess: (data) => {
-                Messages.refetch()
+                // Messages.refetch()
             },
             onError: () => {
             },
@@ -64,11 +65,36 @@ export default function TicketChat(){
         // Messages.data = data.data;
         return data;
     },{
-        onSuccess: () => {
+        onSuccess: (data) => {
+            setChat(data)
             setTimeout(()=>{
                 scrollToBottom();
             },1000)
         }});
+    const connectWebSocket = () => {
+        window.Echo.private(`messages`)
+            .listen('MessageEvent', (data) => {
+                console.log(data)
+                setChat(prev => {
+                    return {
+                        ...prev,
+                        messages: [...prev.messages, data.message]
+                    }
+                })
+                setTimeout(()=>{
+                    scrollToBottom();
+                },500)
+            });
+    }
+    useEffect(() => {
+        Messages.refetch();
+        connectWebSocket();
+
+        return () => {
+            window.Echo.leave("messages");
+        }
+    }, []);
+    console.log(chat)
 
     return(
         <Box position="absolute" dir="rtl" display="flex" justifyContent="center" alignItems="center" height="92vh"   sx={{
@@ -93,7 +119,7 @@ export default function TicketChat(){
                     <Typography>آخرین آپدیت در{Messages?.data?.update}</Typography>
                     <Box sx={{ height: {xs:"300px",md:"363px"}, overflowY: 'auto' }}>
                         <Box width="100%" ref={chatBoxRef} display="flex" justifyContent="flex-end" flexDirection="column" p={1}>
-                            {Messages?.data?.messages.map((item, index) => (
+                            {chat?.messages?.map((item, index) => (
                                 item.is_sender ?
                                     ( <Box display="flex" justifyContent="start" flexDirection="row" gap={1}
                                            key={index}>

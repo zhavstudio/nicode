@@ -29,8 +29,10 @@ class MessageEvent implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
+        // Assuming 'user_id' is a key in the $message array
         return [
-            new PrivateChannel('message'),
+            new PrivateChannel("messages"),
         ];
     }
+
 }
