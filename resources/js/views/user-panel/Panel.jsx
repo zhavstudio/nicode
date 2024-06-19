@@ -26,13 +26,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 
 const drawerItems = [
     {
-        id: 1,
-        name: "کاربران",
-        route: "/panel/ticket",
-        icon: <DashboardOutlinedIcon/>,
-        hasChildren: false,
-    },
-    {
         id: 2,
         name: "تیکت ها",
         route: "/panel/ticket",
@@ -41,7 +34,7 @@ const drawerItems = [
     },
     {
         id: 6,
-        name: "امور مالی",
+        name: "کیف پول",
         route: "/panel/financial",
         icon: <DnsOutlinedIcon/>,
         hasChildren: false,

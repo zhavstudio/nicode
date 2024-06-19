@@ -80,6 +80,8 @@ class MessageController
         return [
             'update'    => CalendarUtils::strftime('Y-m-d', strtotime($update)),
             'ticket_title' => $ticketTitle,
+            'id'          => auth()->user()->id,
+            'phone'       => $ticket->user->phone_number,
             'messages' => $messages,
         ];
     }
@@ -90,7 +92,7 @@ class MessageController
         $ticketRecord->ticket()->associate($ticket);
         $ticketRecord->user_id = auth()->user()->id;
         $ticketRecord->save();
-        SendMessage::dispatch($ticketRecord,auth()->id());
+        SendMessage::dispatch($ticketRecord);
 
         return response()->json([
             'success' => true,

@@ -8,7 +8,7 @@ import {
     Grid, IconButton, InputAdornment,
     InputLabel,
     MenuItem,
-    Select,
+    Select, Snackbar,
     TextareaAutosize, TextField,
     Typography
 } from "@mui/material";
@@ -18,6 +18,7 @@ import axios from './../../axiosConfig';
 import {useMutation, useQuery} from "react-query";
 import {route} from './helpers'
 import {useParams} from "react-router-dom";
+import {Alert} from "@mui/lab";
 
 
 
@@ -28,7 +29,9 @@ export default function TicketChat(){
     const [chat, setChat] = React.useState([]);
     const params = useParams();
     const chatBoxRef = useRef(null);
-
+    const [openSnack, setOpenSnack] = React.useState(false);
+    const [status, setStatus] = React.useState("success");
+    const [message, setMessage] = React.useState("This is a success message!");
 
 
 
@@ -48,9 +51,14 @@ export default function TicketChat(){
             return response.data;
         }, {
             onSuccess: (data) => {
-                // Messages.refetch()
+                setOpenSnack(true);
+                setStatus("success");
+                setMessage("تیکت ارسال شد");
             },
             onError: () => {
+                setOpenSnack(true);
+                setStatus("error");
+                setMessage("ارسال با مشکل مواجه شد");
             },
             onSettled: () => {
             },
@@ -72,27 +80,27 @@ export default function TicketChat(){
             },1000)
         }});
     const connectWebSocket = () => {
-        window.Echo.private(`messages`)
+        window.Echo.private(`messages.${params.id}`)
             .listen('MessageEvent', (data) => {
-                console.log(data)
                 setChat(prev => {
                     return {
                         ...prev,
-                        messages: [...prev.messages, data.message]
-                    }
-                })
-                setTimeout(()=>{
-                    scrollToBottom();
-                },500)
+                        messages: [...prev.messages, {
+                            ...data.message,
+                            is_sender: data.message.user_id === prev.id
+                        }]
+                    };
+                });
             });
-    }
+    };
     useEffect(() => {
-        Messages.refetch();
+        // Messages.refetch();
         connectWebSocket();
 
         return () => {
             window.Echo.leave("messages");
         }
+
     }, []);
     console.log(chat)
 
@@ -101,6 +109,24 @@ export default function TicketChat(){
             width: '100%',
             '@media (min-width: 900px)': {width: '84%',}
             ,}} marginTop={{xs:9,md:7}} p={{xs:1,md:7}} >
+            <Snackbar
+                open={openSnack}
+                autoHideDuration={6000}
+                onClose={() => {
+                    setOpenSnack(false);
+                }}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+                <Alert
+                    onClose={() => {
+                        setOpenSnack(false);
+                    }}
+                    severity={status}
+                    sx={{ width: "100%" }}
+                >
+                    {message}
+                </Alert>
+            </Snackbar>
          <Grid item display="flex" p={{xs:1,md:3}} height={{xs:"83%",md:"563px"}} flexDirection="column" boxShadow={3} borderRadius="20px" bgcolor="#F4F4F4"  width="100%">
              <Box display="flex" justifyContent="space-between" width="100%">
                  <Typography sx={{height:"10%"}}>
@@ -172,7 +198,13 @@ export default function TicketChat(){
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment
-                                    onClick={() => sendMessage.mutate({ text: inputValue })}
+                                    onClick={() => {
+                                        sendMessage.mutate({ text: inputValue }, {
+                                            onSuccess: () => {
+                                                setInputValue('');
+                                            }
+                                        });
+                                    }}
                                     position="start"
                                 >
                                     <IconButton>

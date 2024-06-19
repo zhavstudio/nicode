@@ -85,7 +85,7 @@ export default function Ticket() {
 
     const Ticket = useQuery("Ticket", async () => {
         const { data } = await axios.get(
-            route("api.web.v1.admin.ticket.index")
+            route("api.web.v1.user.userTicket")
         );
         Ticket.data = data.data;
         return Ticket;
