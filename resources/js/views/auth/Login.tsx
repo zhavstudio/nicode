@@ -36,7 +36,7 @@ export default function Login() {
 
 
     return (
-        <Grid container display='flex' flexDirection='row' justifyContent='space-between'>
+        <Grid container display='flex' flexDirection='row' justifyContent='space-between' p={5}>
             <Grid item xs={12} md={5} borderRadius={2} height={{md:'90vh',xs:'50vh'}} bgcolor={theme.palette.Secondary.main}>
                 <Box
                     display="flex"

@@ -17,7 +17,7 @@ import {
     InputBase,
     Modal, Snackbar, TextField,
     Typography,
-    useMediaQuery
+    useMediaQuery,Autocomplete
 } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from '@mui/icons-material/Search';
@@ -76,23 +76,6 @@ function createData(id, title, population, size,density,status) {
     return { id, title, population, size, density,status };
 }
 
-// const rows = [
-//     createData('#1234', 'محمد محمدي', 1324171354, 3287263,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('#1234', 'محمد محمدي', 1403500365, 9596961,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('#1234', 'محمد محمدي', 60483973, 301340,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('#1234', 'محمد محمدي', 327167434, 9833520,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('#1234', 'محمد محمدي', 37602103, 9984670,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('#1234', 'محمد محمدي', 25475400, 7692024,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('#1234', 'محمد محمدي', 83019200, 357578,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('#1234', 'محمد محمدي', 4857000, 70273,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('#1234', 'محمد محمدي', 126577691, 1972550,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('#1234', 'محمد محمدي', 126317000, 377973,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('#1234', 'محمد محمدي', 67022000, 640679,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('##1234', 'محمد محمدي', 67545757, 242495,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('#1234', 'محمد محمدي', 146793744, 17098246,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('#1234', 'محمد محمدي', 200962417, 923768,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-//     createData('#1234', 'محمد محمدي', 210147125, 8515767,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-// ];
 export default function Users() {
     const [openSnack, setOpenSnack] = React.useState(false);
     const [status, setStatus] = React.useState("success");
@@ -173,6 +156,22 @@ export default function Users() {
         addUser.mutate(data)
     };
 
+    const handleChange = (e,v)=>{
+        // console.log(v.value)
+        setValue("gender",v.value)
+    }
+
+    //gender options
+    const gender = [
+        {label: "مرد",value:"0"},
+        {label: "زن",value:"1"},
+    ]
+
+    const userStatus = [
+        {label: "فعال",value:1},
+        {label: "معلق",value:0},
+    ]
+
     return (
         <Box position="absolute" display="flex" justifyContent="center" alignItems="center" height="92vh"   sx={{
             width: '100%',
@@ -237,9 +236,9 @@ export default function Users() {
                                             <Box display="flex" flexDirection="column" width="50%">
                                                 <Box display="flex" flexDirection="row">
                                                     <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
-                                                    <Typography>نام و نام خانوادگی</Typography>
+                                                    <Typography>نام</Typography>
                                                 </Box>
-                                                <TextField {...register("name",{ required: "این فیلد ضروری است" })}
+                                                <TextField {...register("first_name",{ required: "این فیلد ضروری است" })}
                                                     sx={{'& .MuiOutlinedInput-root': {'& fieldset': {border: 'none',},backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1},}}>
                                                 </TextField>
                                                 <Box display="flex" flexDirection="row">
@@ -254,12 +253,24 @@ export default function Users() {
                                                     <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
                                                     <Typography>جنسیت</Typography>
                                                 </Box>
-                                                <TextField {...register("gender",{ required: "این فیلد ضروری است" })}
-                                                    sx={{'& .MuiOutlinedInput-root': {'& fieldset': {border: 'none',},backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1},}}>
-                                                </TextField>
+                                                <Autocomplete
+                                                    disablePortal
+                                                    {...register("gender",{ required: "این فیلد ضروری است" })}
+                                                    id="combo-box-demo"
+                                                    options={gender}
+                                                    sx={{'& .MuiOutlinedInput-notchedOutline': {border:"none"}, backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1}}
+                                                    renderInput={(params) => <TextField {...params}  />}
+                                                />
 
                                             </Box>
                                             <Box display="flex" flexDirection="column" width="50%">
+                                                <Box display="flex" flexDirection="row">
+                                                    <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
+                                                    <Typography>نام خانوادگی</Typography>
+                                                </Box>
+                                                <TextField {...register("last_name",{ required: "این فیلد ضروری است" })}
+                                                           sx={{'& .MuiOutlinedInput-root': {'& fieldset': {border: 'none',},backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1},}}>
+                                                </TextField>
                                                 <Box display="flex" flexDirection="row">
                                                     <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
                                                     <Typography>موبایل</Typography>
@@ -274,13 +285,18 @@ export default function Users() {
                                                 <TextField {...register("code_melli",{ required: "این فیلد ضروری است" })}
                                                     sx={{'& .MuiOutlinedInput-root': {'& fieldset': {border: 'none',},backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1},}}>
                                                 </TextField>
-                                                <Box display="flex" flexDirection="row">
-                                                    <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
-                                                    <Typography>وضعیت</Typography>
-                                                </Box>
-                                                <TextField {...register("status",{ required: "این فیلد ضروری است" })}
-                                                    sx={{'& .MuiOutlinedInput-root': {'& fieldset': {border: 'none',},backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1},}}>
-                                                </TextField>
+                                                {/*<Box display="flex" flexDirection="row">*/}
+                                                {/*    <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>*/}
+                                                {/*    <Typography>وضعیت</Typography>*/}
+                                                {/*</Box>*/}
+                                                {/*<Autocomplete*/}
+                                                {/*    disablePortal*/}
+                                                {/*    {...register("status",{ required: "این فیلد ضروری است" })}*/}
+                                                {/*    id="combo-box-demo"*/}
+                                                {/*    options={userStatus}*/}
+                                                {/*    sx={{'& .MuiOutlinedInput-notchedOutline': {border:"none"}, backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1}}*/}
+                                                {/*    renderInput={(params) => <TextField {...params}  />}*/}
+                                                {/*/>*/}
                                             </Box>
                                         </Box>
                                         <Divider/>
@@ -321,12 +337,12 @@ export default function Users() {
                                             <Box display="flex" flexDirection="column" width="50%">
                                                 <Box display="flex" flexDirection="row">
                                                     <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
-                                                    <Typography>نام و نام خانوادگی</Typography>
+                                                    <Typography>نام</Typography>
                                                 </Box>
-                                                <TextField {...register("name",{ required: "این فیلد ضروری است" })}
+                                                <TextField {...register("first_name",{ required: "این فیلد ضروری است" })}
                                                            sx={{'& .MuiOutlinedInput-root': {'& fieldset': {border: 'none',},backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1},}}>
                                                 </TextField>
-                                                {errors.name?.type === 'required' && <p style={{color:'red'}} role="alert">{errors.name.message}</p>}
+                                                {errors.first_name?.type === 'required' && <p style={{color:'red'}} role="alert">{errors.name.message}</p>}
                                                 <Box display="flex" flexDirection="row">
                                                     <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
                                                     <Typography>ایمیل</Typography>
@@ -339,12 +355,24 @@ export default function Users() {
                                                     <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
                                                     <Typography>جنسیت</Typography>
                                                 </Box>
-                                                <TextField {...register("gender",{ required: "این فیلد ضروری است" })}
-                                                           sx={{'& .MuiOutlinedInput-root': {'& fieldset': {border: 'none',},backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1},}}>
-                                                </TextField>
+                                                <Autocomplete
+                                                    disablePortal
+                                                    id="combo-box-demo"
+                                                    options={gender}
+                                                    onChange={(event, value) => handleChange(event,value)}
+                                                    sx={{'& .MuiOutlinedInput-notchedOutline': {border:"none"} ,backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1}}
+                                                    renderInput={(params) => <TextField {...params}  />}
+                                                />
                                                 {errors.gender?.type === 'required' && <p style={{color:'red'}} role="alert">{errors.gender.message}</p>}
                                             </Box>
                                             <Box display="flex" flexDirection="column" width="50%">
+                                                <Box display="flex" flexDirection="row">
+                                                    <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
+                                                    <Typography>نام خانوادگی</Typography>
+                                                </Box>
+                                                <TextField {...register("last_name",{ required: "این فیلد ضروری است" })}
+                                                           sx={{'& .MuiOutlinedInput-root': {'& fieldset': {border: 'none',},backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1},}}>
+                                                </TextField>
                                                 <Box display="flex" flexDirection="row">
                                                     <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
                                                     <Typography>موبایل</Typography>
@@ -361,14 +389,19 @@ export default function Users() {
                                                            sx={{'& .MuiOutlinedInput-root': {'& fieldset': {border: 'none',},backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1},}}>
                                                 </TextField>
                                                 {errors.code_melli?.type === 'required' && <p style={{color:'red'}} role="alert">{errors.code_melli.message}</p>}
-                                                <Box display="flex" flexDirection="row">
-                                                    <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
-                                                    <Typography>وضعیت</Typography>
-                                                </Box>
-                                                <TextField {...register("status",{ required: "این فیلد ضروری است" })}
-                                                           sx={{'& .MuiOutlinedInput-root': {'& fieldset': {border: 'none',},backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1},}}>
-                                                </TextField>
-                                                {errors.status?.type === 'required' && <p style={{color:'red'}} role="alert">{errors.status.message}</p>}
+                                                {/*<Box display="flex" flexDirection="row">*/}
+                                                {/*    <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>*/}
+                                                {/*    <Typography>وضعیت</Typography>*/}
+                                                {/*</Box>*/}
+                                                {/*<Autocomplete*/}
+                                                {/*    disablePortal*/}
+                                                {/*    {...register("status",{ required: "این فیلد ضروری است" })}*/}
+                                                {/*    id="combo-box-demo"*/}
+                                                {/*    options={userStatus}*/}
+                                                {/*    sx={{'& .MuiOutlinedInput-notchedOutline': {border:"none"}, backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1}}*/}
+                                                {/*    renderInput={(params) => <TextField {...params} />}*/}
+                                                {/*/>*/}
+                                                {/*{errors.status?.type === 'required' && <p style={{color:'red'}} role="alert">{errors.status.message}</p>}*/}
                                             </Box>
                                         </Box>
                                         <Divider/>

@@ -2,6 +2,6 @@
 
 use Illuminate\Support\Facades\Broadcast;
 
-Broadcast::channel('messages', function ($user) {
+Broadcast::channel('messages.{ticket_id}', function ($user) {
     return true;
 });

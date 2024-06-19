@@ -1,5 +1,6 @@
 const initialState = {
     isAuthenticated: localStorage.getItem('token') !== null,
+    token : localStorage.getItem('token')
 };
 
 const authReducer = (state = initialState, action) => {
@@ -8,6 +9,7 @@ const authReducer = (state = initialState, action) => {
             return {
                 ...state,
                 isAuthenticated: action.payload,
+                token: action.payload.token,
             };
         default:
             return state;

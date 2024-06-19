@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {
     Avatar,
     Box,
@@ -22,7 +22,7 @@ import {useParams} from "react-router-dom";
 
 
 export default function TicketChat(){
-
+    const [chat, setChat] = React.useState([]);
     const [age, setAge] = React.useState('');
     const [inputValue, setInputValue] = useState('');
     const params = useParams();
@@ -43,11 +43,11 @@ export default function TicketChat(){
     };
 
     const sendMessage = useMutation(async (data) => {
-            const response = await axios.post(route("api.web.v1.admin.message",{ticket:params.id}),data);
+            const response = await axios.post(route("api.web.v1.user.message",{ticket:params.id}),data);
             return response.data;
         }, {
             onSuccess: (data) => {
-                Messages.refetch()
+                // Messages.refetch()
             },
             onError: () => {
             },
@@ -59,16 +59,41 @@ export default function TicketChat(){
 
     const Messages = useQuery("Messages", async () => {
         const { data } = await axios.get(
-            route("api.web.v1.admin.messages",{ticket:params.id})
+            route("api.web.v1.user.messages",{ticket:params.id})
         );
         // Messages.data = data.data;
         return data;
     },{
-        onSuccess: () => {
+        onSuccess: (data) => {
+            setChat(data)
             setTimeout(()=>{
                 scrollToBottom();
             },1000)
         }});
+
+    const connectWebSocket = () => {
+        window.Echo.private(`messages.${params.id}`)
+            .listen('MessageEvent', (data) => {
+                setChat(prev => {
+                    return {
+                        ...prev,
+                        messages: [...prev.messages, {
+                            ...data.message,
+                            is_sender: data.message.user_id === prev.id
+                        }]
+                    };
+                });
+            });
+    };
+
+    useEffect(() => {
+        Messages.refetch();
+        connectWebSocket();
+
+        return () => {
+            window.Echo.leave("messages");
+        }
+    }, []);
 
     return(
         <Box position="absolute" dir="rtl" display="flex" justifyContent="center" alignItems="center" height="92vh"   sx={{
@@ -93,7 +118,7 @@ export default function TicketChat(){
                     <Typography>آخرین آپدیت در{Messages?.data?.update}</Typography>
                     <Box sx={{ height: {xs:"300px",md:"363px"}, overflowY: 'auto' }}>
                         <Box width="100%" ref={chatBoxRef} display="flex" justifyContent="flex-end" flexDirection="column" p={1}>
-                            {Messages?.data?.messages.map((item, index) => (
+                            {chat?.messages?.map((item, index) => (
                                 item.is_sender ?
                                     ( <Box display="flex" justifyContent="start" flexDirection="row" gap={1}
                                            key={index}>
@@ -138,15 +163,21 @@ export default function TicketChat(){
                                 mt: 2,
                                 pl: 5,
                                 backgroundColor: theme.palette.Primary[20], borderRadius: '20px',
-                                boxShadow:{xs:3,md:0},
-                                width:{xs:"100%",md:"97%"}
+                                boxShadow: { xs: 3, md: 0 },
+                                width: { xs: "100%", md: "97%" }
                             },
                         }}
 
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment
-                                    onClick={() => sendMessage.mutate({ text: inputValue })}
+                                    onClick={() => {
+                                        sendMessage.mutate({ text: inputValue }, {
+                                            onSuccess: () => {
+                                                setInputValue('');
+                                            }
+                                        });
+                                    }}
                                     position="start"
                                 >
                                     <IconButton>
@@ -161,7 +192,7 @@ export default function TicketChat(){
                     <Typography fontWeight="900" mt={2}>جزییات</Typography>
                     <Divider sx={{mt:"10px"}}/>
                     <Typography mt={2} fontWeight="500">تیکت ارسال شده توسط</Typography>
-                    <Typography mt={2}>09331210757</Typography>
+                    <Typography mt={2}>{Messages?.data?.phone}</Typography>
                     <Typography mt={2} fontWeight="500">وضعیت تیکت</Typography>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Age</InputLabel>

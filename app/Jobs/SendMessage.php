@@ -17,7 +17,7 @@ class SendMessage implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public Message $message, public $userId)
+    public function __construct(public Message $message)
     {
         //
     }
@@ -33,7 +33,6 @@ class SendMessage implements ShouldQueue
             'text' => $this->message->text,
             'time' => $this->message->time,
             'ticket_id' => $this->message->ticket_id,
-            'is_sender'  => $this->message->user_id === $this->userId
         ]);
     }
 }

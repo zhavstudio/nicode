@@ -1,5 +1,5 @@
 import axios from 'axios';
-// console.log(import.meta.env.VITE_APP_URL);
+
 console.log(document.head.querySelector('meta[name="csrf-token"]').getAttribute("content"))
 console.log(localStorage.getItem('token'))
 const instance = axios.create({
@@ -12,6 +12,16 @@ const instance = axios.create({
         'X-Requested-With': 'XMLHttpRequest',
         'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').getAttribute("content"),
     },
+});
+
+instance.interceptors.request.use(config => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers['Authorization'] = 'Bearer ' + token;
+    }
+    return config;
+}, error => {
+    return Promise.reject(error);
 });
 
 export default instance;
