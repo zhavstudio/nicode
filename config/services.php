@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'zarinpal' => [
+        'merchantID' => '7e05af3e-43a9-4bdd-8839-a3ab7da74ec7',
+        'zarinGate' => false,
+        'sandbox' => false,
+    ],
 ];

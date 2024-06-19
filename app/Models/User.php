@@ -7,6 +7,7 @@ use App\Enums\UserStatusEnum;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,7 +23,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string  $last_name
  * @property string  $email
  * @property string  $email_verified_at
- * @property string  $phone
+ * @property string  $phone_number
  * @property string  $phone_verified_at
  * @property string  $verification_code
  * @property string  $verification_code_expire
@@ -151,5 +152,10 @@ class User extends Authenticatable implements LaratrustUser
     public function messages()
     {
         return $this->hasMany(Message::class);
+    }
+
+    public function wallet(): HasOne
+    {
+        return $this->hasOne(Wallet::class, 'user_id');
     }
 }

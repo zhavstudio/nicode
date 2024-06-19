@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\TicketController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,5 +39,7 @@ Route::name("api.web.v1.user.")->group(function () {
 
     Route::post("first-ticket", [TicketController::class,"store"])->name("first-ticket");
 
+    Route::post('transaction', [PaymentController::class, 'store'])->name('transaction');
+    Route::get('verify-payment', [PaymentController::class, 'verifyPayment'])->name('verifyPayment');
 
 });

@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * @property integer $user_id
+ * @property integer $text
+ * @property string  $ticket
+ * @property integer $user
+ */
 class Message extends Model
 {
     use HasFactory;

@@ -7,12 +7,14 @@
     "require": {
         "php": "^8.2",
         "bensampo/laravel-enum": "^6.11",
+        "ippanel/php-rest-sdk": "^2.0",
         "laravel/framework": "^11.0",
         "laravel/reverb": "@beta",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "morilog/jalali": "^3.4",
-        "santigarcor/laratrust": "^8.3"
+        "santigarcor/laratrust": "^8.3",
+        "shetabit/payment": "^5.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

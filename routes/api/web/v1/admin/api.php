@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Api\Admin\UserController;
 
-use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\Admin\MessageController;
 use App\Http\Controllers\Api\TicketController;
 use Illuminate\Support\Facades\Route;
 

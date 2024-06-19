@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\LoginEvent;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -38,10 +39,11 @@ class RegisterController
 
         $user = User::where('phone_number', '=', $request['phone_number'])->first();
         if ($user) {
-            return $user->update([
+             $user->update([
                 'verification_code'        => rand(100000, 999999),
                 'verification_code_expire' => Carbon::now()->addHour(intval(config("app.EXPIRATION_HOUR_VERIFICATION_CODE")))
             ]);
+             LoginEvent::dispatch($user);
         } else {
             $user = User::create([
                 'phone_number'             => $request['phone_number'],
@@ -49,6 +51,7 @@ class RegisterController
                 'verification_code_expire' => Carbon::now()->addHour(intval(config("app.EXPIRATION_HOUR_VERIFICATION_CODE")))
             ]);
              $user->addRole("user");
+             LoginEvent::dispatch($user);
             return '1';
         }
 

@@ -10,6 +10,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property integer $user_id
+ * @property integer $assigned_agent_id
+ * @property string  $title
+ * @property integer $priority
+ * @property integer $status
+ */
+
 class Ticket extends Model
 {
     use HasFactory, HasUlids;

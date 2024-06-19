@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\LoginEvent;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -41,7 +42,7 @@ class LoginController
             ]);
         } elseif (!Carbon::now()->addHour(intval(config("app.EXPIRATION_HOUR_VERIFICATION_CODE"))) >= $user->verification_code_expire){
             // dispatch new verification code
-            return '564651';
+            LoginEvent::dispatch($user);
         }
 
         return response()->json([
