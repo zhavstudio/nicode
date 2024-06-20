@@ -74,11 +74,16 @@ class MessageController
 
         $ticketTitle = $ticket->title;
         $update = $ticket->updated_at;
+        $create = $ticket->created_at;
+
         $messages = MessagesResource::collection($ticket->messages()->get());
 
         return [
             'update'    => CalendarUtils::strftime('Y-m-d', strtotime($update)),
+            'create'    => CalendarUtils::strftime('Y-m-d', strtotime($create)),
             'ticket_title' => $ticketTitle,
+            'id'          => auth()->user()->id,
+            'phone'       => $ticket->user->phone_number,
             'messages' => $messages,
         ];
     }

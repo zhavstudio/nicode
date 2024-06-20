@@ -24,6 +24,9 @@ Route::name("api.web.v1.admin.")->group(function () {
 
     Route::apiResource("ticket", TicketController::class)->only("index","store");
 
+    Route::get('/unassigned-tickets', [TicketController::class, 'unassignedTickets'])
+        ->name('unassigned');
+
     Route::get('/messages/{ticket}', [MessageController::class, 'messages'])
         ->name('messages');
 

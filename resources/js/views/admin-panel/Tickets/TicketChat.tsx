@@ -12,11 +12,11 @@ import {
     TextareaAutosize, TextField,
     Typography
 } from "@mui/material";
-import theme from "./../../Custom";
+import theme from "./../../../Custom";
 import SendIcon from '@mui/icons-material/Send';
-import axios from './../../axiosConfig';
+import axios from './../../../axiosConfig';
 import {useMutation, useQuery} from "react-query";
-import {route} from './helpers'
+import {route} from './../helpers'
 import {useParams} from "react-router-dom";
 import {Alert} from "@mui/lab";
 
@@ -94,7 +94,6 @@ export default function TicketChat(){
             });
     };
     useEffect(() => {
-        // Messages.refetch();
         connectWebSocket();
 
         return () => {
@@ -130,7 +129,7 @@ export default function TicketChat(){
          <Grid item display="flex" p={{xs:1,md:3}} height={{xs:"83%",md:"563px"}} flexDirection="column" boxShadow={3} borderRadius="20px" bgcolor="#F4F4F4"  width="100%">
              <Box display="flex" justifyContent="space-between" width="100%">
                  <Typography sx={{height:"10%"}}>
-                     تيكت باز شده در
+                     تيكت باز شده در{Messages?.data?.create}
                  </Typography>
                  <Button  variant="contained" sx={{width:"10%",pl:2,borderRadius:"20px"}}>
                     بستن تیکت
@@ -138,7 +137,7 @@ export default function TicketChat(){
              </Box>
              <Divider sx={{mt:"10px"}}/>
             <Box display="flex" flexDirection="row" width="100%">
-                <Box display="flex" flexDirection="column">
+                <Box display="flex" flexDirection="column" width="60%">
                     <Typography fontWeight="900">
                         {Messages?.data?.ticket_title}
                     </Typography>

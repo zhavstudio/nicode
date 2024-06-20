@@ -32,8 +32,8 @@ if (userDetails.isLoading){
             width: '100%', backgroundColor: theme.palette.Primary[20], borderRadius: "20px",
             '@media (min-width: 900px)': {width: '78%',}
             ,
-        }} marginTop={{xs: 9, md: "100px"}} ml="50px">
-            <Grid item xs={4} p={3} pl={0}>
+        }} marginTop={{xs: 9, md: "100px"}} ml={{xs:0,md:"50px"}}>
+            <Grid item xs={12} md={4}  p={3} pl={0}>
 
                 <Typography fontWeight={900}>اطلاعات حساب کاربری</Typography>
                 <Box display="flex" flexDirection="row" gap="53px" mt={2} position="relative" >
@@ -146,7 +146,7 @@ if (userDetails.isLoading){
                     </Box>
                 </Box>
             </Grid>
-            <Grid item xs={8} p={3}>
+            <Grid item display={{xs: "none",md:"block"}} md={8}  p={3}>
                 <UsersDetailsTab tickets={userDetails.data.data.user_tickets}/>
             </Grid>
         </Grid>
