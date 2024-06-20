@@ -10,11 +10,12 @@ import TableRow from '@mui/material/TableRow';
 import {alpha, Box, Button, Grid, InputAdornment, InputBase, useMediaQuery} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from '@mui/icons-material/Search';
-import theme from "./../../Custom";
+import theme from "../../../Custom.js";
 import { Link as RouterLink } from 'react-router-dom';
 import {useQuery} from "react-query";
-import {route} from './helpers'
-import axios from './../../axiosConfig';
+import {route} from '../helpers.js'
+import axios from '../../../axiosConfig.js';
+import TicketTab from "./TicketTab";
 
 
 
@@ -100,89 +101,14 @@ export default function Ticket() {
     }
 
     return (
-        <Box position="absolute"  display="flex" justifyContent="center" alignItems="center" height="92vh"   sx={{
-            width: '100%',
-            '@media (min-width: 900px)': {width: '84%',}
-            ,}} marginTop={{xs:9,md:7}}>
-            <Grid item width="100%" p={{xs:2,md:7}}>
-                <Paper sx={{ width: '100%', overflow: 'hidden' ,borderRadius:"20px",bgcolor:"#F4F4F4",boxShadow:3}}>
-                   <Box display="flex" justifyContent="space-between">
-                       {isXsScreen && (
-                           <Button
-                               to={"/panel/chat"}
-                               component={RouterLink}
-                               variant="contained"
-                               sx={{ width: "10%",height:"10%", borderRadius: "50%", margin: 2, bgcolor: theme.palette.secondary.main }}
-                           >
-                               افزودن
-                           </Button>
-                       )}
-                       {isMdOrHigher && (
-                           <Button
-                               variant="contained"
-                               sx={{ width: "10%", borderRadius: "20px", margin: 2, bgcolor: theme.palette.secondary.main,textDecoration: "none" }}
-                               component={RouterLink} to="/panel/chat">
-                               تیکت جدید
-                           </Button>
-                       )}
-                       <InputBase
-                           sx={{ ml: 1 ,bgcolor:'#FFFFFF',borderRadius:"20px",margin:2,px:2}}
-                           placeholder="جستجو ..."
-                           inputProps={{ 'aria-label': 'search google maps' ,dir:"rtl"}}
-                           startAdornment={
-                               <InputAdornment position="start">
-                                   <SearchIcon />
-                               </InputAdornment>
-                           }
-                       />
-                   </Box>
-                    <TableContainer sx={{ maxHeight: 440 }}>
-                        <Table >
-                            <TableHead>
-                                <TableRow>
-                                    {columns.map((column) => (
-                                        <TableCell
-                                            key={column.id}
-                                            align={column.align}
-                                            style={{ minWidth: column.minWidth }}
-                                        >
-                                            {column.label}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    .map((row) => {
-                                        return (
-                                            <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                                                {columns.map((column) => {
-                                                    const value = row[column.id];
-                                                    return (
-                                                        <TableCell key={column.id} align={column.align} component={RouterLink} to={`/panel/chat/${row.id}`}>
-                                                            {column.format && typeof value === 'number'
-                                                                ? column.format(value)
-                                                                : value}
-                                                        </TableCell>
-                                                    );
-                                                })}
-                                            </TableRow>
-                                        );
-                                    })}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <TablePagination
-                        rowsPerPageOptions={[10, 25, 100]}
-                        component="div"
-                        count={rows.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
-                </Paper>
+        <Grid dir="rtl" container position="absolute" height="auto" sx={{
+            width: '100%', backgroundColor: theme.palette.Primary[20], borderRadius: "20px",
+            '@media (min-width: 900px)': {width: '78%',}
+            ,
+        }} marginTop={{xs: 9, md: "100px"}} ml={{xs:0,md:"50px"}}>
+            <Grid item xs={12} p={1}>
+                <TicketTab/>
             </Grid>
-        </Box>
+        </Grid>
     )
 }

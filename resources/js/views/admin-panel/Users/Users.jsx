@@ -167,10 +167,6 @@ export default function Users() {
         {label: "زن",value:"1"},
     ]
 
-    const userStatus = [
-        {label: "فعال",value:1},
-        {label: "معلق",value:0},
-    ]
 
     return (
         <Box position="absolute" display="flex" justifyContent="center" alignItems="center" height="92vh"   sx={{

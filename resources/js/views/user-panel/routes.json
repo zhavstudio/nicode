@@ -1,1 +1,44 @@
-{"routes":{"api.web.v1.user.amin":{"uri":"api\/web\/v1\/user\/salam\/user","name":"api.web.v1.user.amin"},"api.web.v1.user.":{"uri":"api\/web\/v1\/user\/dsfsdddddd","name":"api.web.v1.user."},"api.web.v1.user.messages":{"uri":"api\/web\/v1\/user\/messages\/{ticket}","name":"api.web.v1.user.messages"},"api.web.v1.user.message":{"uri":"api\/web\/v1\/user\/message\/{ticket}","name":"api.web.v1.user.message"},"api.web.v1.user.userTicket":{"uri":"api\/web\/v1\/user\/ticket","name":"api.web.v1.user.userTicket"},"api.web.v1.user.first-ticket":{"uri":"api\/web\/v1\/user\/first-ticket","name":"api.web.v1.user.first-ticket"},"api.web.v1.admin.user.index":{"uri":"api\/web\/v1\/admin\/user","name":"api.web.v1.admin.user.index"},"api.web.v1.admin.user.store":{"uri":"api\/web\/v1\/admin\/user","name":"api.web.v1.admin.user.store"}}}
+{
+    "routes": {
+        "api.web.v1.user.amin": {
+            "uri": "api\/web\/v1\/user\/salam\/user",
+            "name": "api.web.v1.user.amin"
+        },
+        "api.web.v1.user.": {
+            "uri": "api\/web\/v1\/user\/dsfsdddddd",
+            "name": "api.web.v1.user."
+        },
+        "api.web.v1.user.messages": {
+            "uri": "api\/web\/v1\/user\/messages\/{ticket}",
+            "name": "api.web.v1.user.messages"
+        },
+        "api.web.v1.user.message": {
+            "uri": "api\/web\/v1\/user\/message\/{ticket}",
+            "name": "api.web.v1.user.message"
+        },
+        "api.web.v1.user.userTicket": {
+            "uri": "api\/web\/v1\/user\/ticket",
+            "name": "api.web.v1.user.userTicket"
+        },
+        "api.web.v1.user.first-ticket": {
+            "uri": "api\/web\/v1\/user\/first-ticket",
+            "name": "api.web.v1.user.first-ticket"
+        },
+        "api.web.v1.user.transaction": {
+            "uri": "api\/web\/v1\/user\/transaction",
+            "name": "api.web.v1.user.transaction"
+        },
+        "api.web.v1.user.verifyPayment": {
+            "uri": "api\/web\/v1\/user\/verify-payment",
+            "name": "api.web.v1.user.verifyPayment"
+        },
+        "api.web.v1.admin.user.index": {
+            "uri": "api\/web\/v1\/admin\/user",
+            "name": "api.web.v1.admin.user.index"
+        },
+        "api.web.v1.admin.user.store": {
+            "uri": "api\/web\/v1\/admin\/user",
+            "name": "api.web.v1.admin.user.store"
+        }
+    }
+}

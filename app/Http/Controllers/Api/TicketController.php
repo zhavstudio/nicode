@@ -88,4 +88,12 @@ class TicketController
         return UserTicketResource::collection(auth()->user()->ticket()->get());
     }
 
+    /**
+     * Display a listing of the resource.
+     */
+    public function unassignedTickets()
+    {
+        return UserTicketResource::collection(Ticket::where("assigned_id","=",null)->get());
+    }
+
 }

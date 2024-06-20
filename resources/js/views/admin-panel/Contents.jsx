@@ -1,8 +1,8 @@
 import * as React from "react";
 import {Route, Routes} from "react-router-dom";
-import Ticket from "./Ticket";
+import Ticket from "./Tickets/Ticket";
 import Financial from "./Financial";
-import TicketChat from "./TicketChat";
+import TicketChat from "./Tickets/TicketChat";
 import Users from "./Users/Users.jsx";
 import UsersDetails from "./Users/UsersDetails.jsx";
 import AllTransactions from "@/views/admin-panel/AllTransactions.jsx";

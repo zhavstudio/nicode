@@ -24,8 +24,9 @@ class LoginListener extends BaseListener
         $patternValues = [
             "code"         => $event->user->verification_code
         ];
-
-        $this->FARAZAMAN_SMS_PANEL(env("FARAZ_PATTERN_LOGIN_SUCCESS", null), preg_replace('/^0/', '', $event->user->phone_number), $patternValues);
-        info('New login code sent to'. $event->user->phone_number);
+        if (env('APP_ENV') !== 'local'){
+            $this->FARAZAMAN_SMS_PANEL(env("FARAZ_PATTERN_LOGIN_SUCCESS", null), preg_replace('/^0/', '', $event->user->phone_number), $patternValues);
+            info('New login code sent to'. $event->user->phone_number);
+        }
     }
 }
