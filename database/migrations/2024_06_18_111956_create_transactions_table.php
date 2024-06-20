@@ -17,6 +17,7 @@ return new class extends Migration
             $table->ulid('id')->autoIncrement();
             $table->decimal('amount', 8, 2);
             $table->string('transactionID');
+            $table->string('referenceID')->nullable();
             $table->tinyInteger('status')->default(TransactionStatusEnum::pending);
             $table->string('bank')->default('zarinpal');
             $table->foreignIdFor(Wallet::class);

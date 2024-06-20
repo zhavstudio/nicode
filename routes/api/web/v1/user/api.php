@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\TicketController;
+use App\Http\Controllers\Api\User\TransactionController;
 use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,8 @@ Route::name("api.web.v1.user.")->group(function () {
     Route::get("ticket", [TicketController::class,"userTicket"])->name("userTicket");
 
     Route::post("first-ticket", [TicketController::class,"store"])->name("first-ticket");
+
+    Route::get('transaction-list', [TransactionController::class, 'index'])->name('transaction-list');
 
     Route::post('transaction', [PaymentController::class, 'store'])->name('transaction');
     Route::get('verify-payment', [PaymentController::class, 'verifyPayment'])->name('verifyPayment');

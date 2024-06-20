@@ -20,7 +20,7 @@ final class TransactionStatusEnum extends Enum
         return match ($value) {
             self::pending => 'در انتظار',
             self::success => 'موفق',
-            self::failed => 'شکست',
+            self::failed => 'ناموفق',
             default => self::getKey($value),
         };
     }

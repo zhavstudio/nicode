@@ -20,9 +20,8 @@ class TransactionObserver
      */
     public function updated(Transaction $transaction): void
     {
-        if ($transaction->isDirty('status') && $transaction->status === TransactionStatusEnum::success) {
-                $wallet = $transaction->wallet;
-//            dd($transaction->amount);
+        if ($transaction->isDirty('status') && $transaction->status->value === TransactionStatusEnum::success) {
+            $wallet = $transaction->wallet;
             $amount = $transaction->amount >= 0 ? $transaction->amount : -$transaction->amount;
 
             $wallet->total += floatval($amount);

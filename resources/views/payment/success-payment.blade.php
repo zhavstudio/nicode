@@ -64,14 +64,14 @@
     </div>
     <h1>پرداخت موفق</h1>
     <p>کد پیگیری شما<br/> {{$referenceId}}</p>
-    <a class="button-33" href="{{env('VITE_APP_URL')}}" id="timerButton">انتقال به پنل تا10 ثانیه</a>
+    <a class="button-33" href="{{env('VITE_APP_URL')}}/panel/financial" id="timerButton">انتقال به پنل تا10 ثانیه</a>
 </div>
 <script>
     // Get the button element
     const timerButton = document.getElementById('timerButton');
 
     // Set the redirect URL
-    const redirectUrl = '{{env('VITE_APP_URL')}}';
+    const redirectUrl = '{{env('VITE_APP_URL')}}/panel/financial';
 
     // Set the countdown duration in seconds
     const countdownDuration = 10;

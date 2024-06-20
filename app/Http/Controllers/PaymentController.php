@@ -35,10 +35,10 @@ class PaymentController
     public function verifyPayment(Request $request)
     {
         $transaction =  Transaction::where('transactionID', '=', $request['Authority'])->first();
-
         try {
             $receipt = Payment::amount($transaction->amount)->transactionId($transaction->transactionID)->verify();
             $transaction->status = TransactionStatusEnum::success;
+            $transaction->referenceID = $receipt->getReferenceId();
             $transaction->save();
 
             return view('payment.success-payment')->with([
@@ -51,6 +51,8 @@ class PaymentController
             We can catch the exception to handle invalid payments.
             getMessage method, returns a suitable message that can be used in user interface.
              **/
+            $transaction->status = TransactionStatusEnum::failed;
+            $transaction->save();
             return view('payment.failed-payment')->with([
                 'message' => $exception->getMessage()
             ]);

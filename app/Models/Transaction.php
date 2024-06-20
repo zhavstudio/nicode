@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TransactionStatusEnum;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $wallet
  * @property numeric $amount
  * @property numeric $status
+ * @property numeric $transactionID
+ * @property numeric $referenceID
  */
 
 class Transaction extends Model
@@ -47,6 +50,7 @@ class Transaction extends Model
         "wallet_id",
         "amount",
         "transactionID",
+        "referenceID",
     ];
 
     /**
@@ -55,6 +59,7 @@ class Transaction extends Model
      */
     protected $casts = [
 //        'amount'      => 'decimal',
+            'status'    => TransactionStatusEnum::class
     ];
 
     public function wallet():BelongsTo

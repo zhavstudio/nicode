@@ -156,6 +156,6 @@ class User extends Authenticatable implements LaratrustUser
 
     public function wallet(): HasOne
     {
-        return $this->hasOne(Wallet::class, 'user_id');
+        return $this->hasOne(Wallet::class);
     }
 }

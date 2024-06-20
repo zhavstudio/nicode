@@ -74,6 +74,7 @@ export default function Ticket() {
     const isXsScreen = useMediaQuery('(max-width:599px)');
     const isMdOrHigher = useMediaQuery('(min-width:900px)');
 
+
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };

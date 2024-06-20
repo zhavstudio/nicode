@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\User;
 
-use App\Models\Transaction;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
+use App\Http\Resources\Api\User\TransactionResource;
+use App\Http\Resources\Api\User\WalletResource;
+use App\Models\Transaction;
 
 class TransactionController
 {
@@ -13,7 +15,7 @@ class TransactionController
      */
     public function index()
     {
-        //
+        return new WalletResource(auth()->user()->wallet->first());
     }
 
     /**
