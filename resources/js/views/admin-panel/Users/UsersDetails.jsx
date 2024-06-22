@@ -22,6 +22,60 @@ export default function UsersDetails() {
         return userDetails;
     });
 
+    function numberToWords(number) {
+        const ones = ['', 'یک', 'دو', 'سه', 'چهار', 'پنج', 'شش', 'هفت', 'هشت', 'نه'];
+        const tens = ['', '', 'بیست', 'سی', 'چهل', 'پنجاه', 'شصت', 'هفتاد', 'هشتاد', 'نود'];
+        const hundreds = ['', 'صد', 'دویست', 'سیصد', 'چهارصد', 'پانصد', 'ششصد', 'هفتصد', 'هشتصد', 'نهصد'];
+
+        function convertThreeDigits(num) {
+            let word = '';
+            const hundreds_digit = Math.floor(num / 100);
+            const tens_digit = Math.floor((num % 100) / 10);
+            const ones_digit = num % 10;
+
+            if (hundreds_digit > 0) {
+                word += hundreds[hundreds_digit] + ' ';
+            }
+
+            if (tens_digit > 1) {
+                word += tens[tens_digit] + ' ';
+                word += ones[ones_digit] + ' ';
+            } else if (tens_digit === 1) {
+                word += 'ده' + ' ';
+                if (ones_digit > 0) {
+                    word += ones[ones_digit] + ' ';
+                }
+            } else if (ones_digit > 0) {
+                word += ones[ones_digit] + ' ';
+            }
+
+            return word.trim();
+        }
+
+        let word = '';
+        const billions = Math.floor(number / 1000000000);
+        if (billions > 0) {
+            word += convertThreeDigits(billions) + ' میلیارد ';
+            number %= 1000000000;
+        }
+
+        const millions = Math.floor(number / 1000000);
+        if (millions > 0) {
+            word += convertThreeDigits(millions) + ' میلیون ';
+            number %= 1000000;
+        }
+
+        const thousands = Math.floor(number / 1000);
+        if (thousands > 0) {
+            word += convertThreeDigits(thousands) + ' هزار ';
+            number %= 1000;
+        }
+
+        word += convertThreeDigits(number);
+
+        return word + ' تومان';
+    }
+
 if (userDetails.isLoading){
     return (
         <div>loading</div>
@@ -123,12 +177,12 @@ if (userDetails.isLoading){
                     <Box display="flex" flexDirection="row" gap={7}>
                         <Box display="flex" flexDirection="column">
                             <Typography color={theme.palette.Primary[30]}>موجودی به عدد</Typography>
-                            <Typography>تومان 1200000</Typography>
+                            <Typography>تومان {userDetails.data.data.wallet}</Typography>
                         </Box>
                         <Divider color={theme.palette.Primary[20]} orientation="vertical" sx={{height: "37px", marginTop: "5px"}}/>
                         <Box display="flex" flexDirection="column">
                             <Typography color={theme.palette.Primary[30]}>موجودی به حروف</Typography>
-                            <Typography>دویست میلیون تومان</Typography>
+                            <Typography>{numberToWords(userDetails.data.data.wallet)}</Typography>
                         </Box>
                         <Box sx={{ position: 'relative' }}>
                             <Divider
@@ -147,7 +201,8 @@ if (userDetails.isLoading){
                 </Box>
             </Grid>
             <Grid item display={{xs: "none",md:"block"}} md={8}  p={3}>
-                <UsersDetailsTab tickets={userDetails.data.data.user_tickets}/>
+                <UsersDetailsTab tickets={userDetails.data.data.user_tickets} transactions={userDetails.data.data.user_transactions
+                }/>
             </Grid>
         </Grid>
     )

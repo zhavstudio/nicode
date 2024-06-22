@@ -220,29 +220,29 @@ export default function TicketChat(){
                     <Divider sx={{mt:"10px"}}/>
                     <Typography mt={2} fontWeight="500">تیکت ارسال شده توسط</Typography>
                     <Typography mt={2}>{Messages?.data?.phone}</Typography>
-                    <Typography mt={2} fontWeight="500">وضعیت تیکت</Typography>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Age</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={age}
-                            label="Age"
-                            onChange={handleChange}
-                            sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        '& fieldset': {
-                                            borderColor: theme.palette.Primary[20],
-                                        }},
-                                    backgroundColor: theme.palette.Primary[20],
-                                    borderRadius: '20px',
-                                }}
-                        >
-                            <MenuItem value={10}>Ten</MenuItem>
-                            <MenuItem value={20}>Twenty</MenuItem>
-                            <MenuItem value={30}>Thirty</MenuItem>
-                        </Select>
-                    </FormControl>
+                    {/*<Typography mt={2} fontWeight="500">وضعیت تیکت</Typography>*/}
+                    {/*<FormControl fullWidth>*/}
+                    {/*    <InputLabel id="demo-simple-select-label">Age</InputLabel>*/}
+                    {/*    <Select*/}
+                    {/*        labelId="demo-simple-select-label"*/}
+                    {/*        id="demo-simple-select"*/}
+                    {/*        value={age}*/}
+                    {/*        label="Age"*/}
+                    {/*        onChange={handleChange}*/}
+                    {/*        sx={{*/}
+                    {/*                '& .MuiOutlinedInput-root': {*/}
+                    {/*                    '& fieldset': {*/}
+                    {/*                        borderColor: theme.palette.Primary[20],*/}
+                    {/*                    }},*/}
+                    {/*                backgroundColor: theme.palette.Primary[20],*/}
+                    {/*                borderRadius: '20px',*/}
+                    {/*            }}*/}
+                    {/*    >*/}
+                    {/*        <MenuItem value={10}>Ten</MenuItem>*/}
+                    {/*        <MenuItem value={20}>Twenty</MenuItem>*/}
+                    {/*        <MenuItem value={30}>Thirty</MenuItem>*/}
+                    {/*    </Select>*/}
+                    {/*</FormControl>*/}
                     <Typography mt={2} fontWeight="500">فایل های پیوست</Typography>
                 </Box>
             </Box>

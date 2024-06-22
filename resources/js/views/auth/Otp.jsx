@@ -63,8 +63,8 @@ export default function Otp() {
 
 
     return (
-        <Grid container display='flex' flexDirection='row' justifyContent='space-between' p={5}>
-            <Grid item xs={12} md={5} borderRadius={2} height={{md: '90vh', xs: '50vh'}}
+        <Grid container display='flex' flexDirection='row' justifyContent='space-between' p={{xs:0,md:5}}>
+            <Grid item xs={12} md={5} borderRadius={2} height={{md: '90vh', xs: '60vh'}}
                   bgcolor={theme.palette.Secondary.main}>
                 <Box
                     display="flex"
@@ -78,7 +78,7 @@ export default function Otp() {
                         من</Typography>
                 </Box>
             </Grid>
-            <Grid item xs={12} md={7} borderRadius={2} height={{md: '90vh', xs: '50vh'}} display="flex"
+            <Grid item xs={12} md={7} borderRadius={2} height={{md: '90vh', xs: '60vh'}} display="flex"
                   justifyContent="center"
                   alignItems="center"
                   flexDirection='column'
@@ -115,7 +115,7 @@ export default function Otp() {
                             fontFamily: 'Dana',
                             fontWeight: '500',
                             color: theme.palette.secondary.main
-                        }}>09038384481</span>را وارد نمایید
+                        }}>{phone}</span>را وارد نمایید
                         </Typography>
                     </ListItem>
                 </List>

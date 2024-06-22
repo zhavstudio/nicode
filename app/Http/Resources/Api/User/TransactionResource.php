@@ -17,6 +17,7 @@ class TransactionResource extends JsonResource
     {
         return [
             'id'        => $this->id,
+//            'user'      => $this->wallet->user->phone_number,
             'amount'    => number_format(intval($this->amount), 0, '.', ',') ,
             'status'    => $this->status->description,
             "created_at" => CalendarUtils::strftime('Y-m-d', strtotime($this->created_at))

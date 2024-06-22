@@ -46,10 +46,10 @@ const columns = [
     { id: 'id', label: 'شماره تیکت', minWidth: 170 ,align: 'right',},
 ];
 
-function createData(id, title, population, size,status) {
-    const density = population / size;
-    return { id, title, population, size, density,status };
+function createData(id, title, population, size , density, status) {
+    return {id, title, population, size , density , status};
 }
+
 
 // const rows = [
 //     createData('#1234', 'محمد محمدي', 1324171354, 3287263,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
@@ -92,21 +92,15 @@ export default function Ticket() {
         return Ticket;
     });
 
-    const rows = [];
 
-    if (Ticket?.data?.data) {
-        rows.push(...Ticket.data.data.map((item, index) =>
-         createData(item.id, item.title, item.created_at, item.updated_at,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>{item.status}</Button>),
-        ));
-    }
 
     return (
         <Grid dir="rtl" container position="absolute" height="auto" sx={{
             width: '100%', backgroundColor: theme.palette.Primary[20], borderRadius: "20px",
             '@media (min-width: 900px)': {width: '78%',}
             ,
-        }} marginTop={{xs: 9, md: "100px"}} ml={{xs:0,md:"50px"}}>
-            <Grid item xs={12} p={1}>
+        }} marginTop={{xs: 11, md: "100px"}} ml={{xs:0,md:"50px"}}>
+            <Grid item xs={12} p={1} >
                 <TicketTab/>
             </Grid>
         </Grid>

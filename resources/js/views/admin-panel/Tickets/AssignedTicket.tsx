@@ -7,7 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import {alpha, Box, Button, Grid, InputAdornment, InputBase, useMediaQuery} from "@mui/material";
+import {alpha, Box, Button, Grid, InputAdornment, InputBase, TableSortLabel, useMediaQuery} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from '@mui/icons-material/Search';
 import theme from "../../../Custom.js";
@@ -45,9 +45,8 @@ const columns = [
     { id: 'id', label: 'شماره تیکت', minWidth: 170 ,align: 'right',},
 ];
 
-function createData(id, title, population, size,status) {
-    const density = population / size;
-    return { id, title, population, size, density,status };
+function createData(id, title, population, size , density, status, updated_at) {
+    return {id, title, population, size , density , status, updated_at};
 }
 
 // const rows = [
@@ -70,9 +69,25 @@ function createData(id, title, population, size,status) {
 export default function AssignedTicket() {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [order, setOrder] = React.useState('desc');
+    const [orderBy, setOrderBy] = React.useState('updated_at');
 
-    const isXsScreen = useMediaQuery('(max-width:599px)');
-    const isMdOrHigher = useMediaQuery('(min-width:900px)');
+
+    const handleRequestSort = (property) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+    const compareFunction = (a, b) => {
+        if (b[orderBy] < a[orderBy]) {
+            return order === 'asc' ? 1 : -1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return order === 'asc' ? -1 : 1;
+        }
+        return 0;
+    };
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -91,11 +106,35 @@ export default function AssignedTicket() {
         return Ticket;
     });
 
+    const backgroundColors = (Status) => {
+        let backgroundColor = "";
+        if (Status === "در انتظار") backgroundColor = alpha('#001949', 0.3);
+        else if (Status === "جدید") backgroundColor = alpha('#0BF04B', 0.3);
+        else if (Status === "بسته") backgroundColor = alpha('#B80B0B', 0.3);
+        else backgroundColor = "white";
+        return backgroundColor;
+    };
+
+    const colors = (Status) => {
+        let Color = "";
+        if (Status === "در انتظار") Color = "black";
+        else if (Status === "جدید") Color = '#23833E';
+        else if (Status === "بسته") Color = "red"
+        else Color = "black";
+        return Color;
+    };
+
+
+
     const rows = [];
 
     if (Ticket?.data?.data) {
         rows.push(...Ticket.data.data.map((item, index) =>
-            createData(item.id, item.title, item.created_at, item.updated_at,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>{item.status}</Button>),
+            createData(item.id, item.title, item.created_at, item.updated_at,item.user, <Button variant="contained" sx={{
+                borderRadius: "20px",
+                bgcolor:backgroundColors(item.status) ,
+                color: colors(item.status)
+            }}>{item.status}</Button>,item.updated_at),
         ));
     }
 
@@ -124,13 +163,19 @@ export default function AssignedTicket() {
                                             align={column.align}
                                             style={{ minWidth: column.minWidth }}
                                         >
-                                            {column.label}
+                                            <TableSortLabel
+                                                active={orderBy === column.id}
+                                                direction={orderBy === column.id ? order : 'asc'}
+                                                onClick={() => handleRequestSort(column.id)}
+                                            >
+                                                {column.label}
+                                            </TableSortLabel>
                                         </TableCell>
                                     ))}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                {rows.sort(compareFunction).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((row) => {
                                         return (
                                             <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>

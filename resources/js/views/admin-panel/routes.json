@@ -20,6 +20,10 @@
             "uri": "api\/web\/v1\/admin\/unassigned-tickets",
             "name": "api.web.v1.admin.unassigned"
         },
+        "api.web.v1.admin.close": {
+            "uri": "api\/web\/v1\/admin\/close-ticket\/{ticket}",
+            "name": "api.web.v1.admin.close"
+        },
         "api.web.v1.admin.messages": {
             "uri": "api\/web\/v1\/admin\/messages\/{ticket}",
             "name": "api.web.v1.admin.messages"
@@ -31,6 +35,10 @@
         "api.web.v1.admin.details": {
             "uri": "api\/web\/v1\/admin\/user-details\/{id}",
             "name": "api.web.v1.admin.details"
+        },
+        "api.web.v1.admin.transaction-list": {
+            "uri": "api\/web\/v1\/admin\/transaction-list",
+            "name": "api.web.v1.admin.transaction-list"
         }
     }
 }

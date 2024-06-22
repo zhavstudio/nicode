@@ -59,9 +59,8 @@ const columns = [
     {id: 'id', label: 'شماره تیکت', minWidth: 170, align: 'right',},
 ];
 
-function createData(id, title, population, size, status) {
-    const density = population / size;
-    return {id, title, population, size, density, status};
+function createData(id, title, population, size , density, status) {
+    return {id, title, population, size , density , status};
 }
 
 // const rows = [
@@ -141,6 +140,7 @@ export default function Ticket() {
                 setOpenSnack(true);
                 setStatus("success");
                 setMessage("تیکت ارسال شد");
+                Ticket.refetch()
             },
             onError: () => {
                 setOpenSnack(true);
@@ -163,18 +163,36 @@ export default function Ticket() {
         firstTicket.mutate(data)
     };
 
+    const backgroundColors = (Status) => {
+        let backgroundColor = "";
+        if (Status === "در انتظار") backgroundColor = alpha('#001949', 0.3);
+        else if (Status === "جدید") backgroundColor = alpha('#0BF04B', 0.3);
+        else if (Status === "بسته") backgroundColor = alpha('#B80B0B', 0.3);
+        else backgroundColor = "white";
+        return backgroundColor;
+    };
+    const colors = (Status) => {
+        let Color = "";
+        if (Status === "در انتظار") Color = "black";
+        else if (Status === "جدید") Color = '#23833E';
+        else if (Status === "بسته") Color = "red"
+        else Color = "black";
+        return Color;
+    };
 
     const rows = [];
 
     if (Ticket?.data?.data) {
         rows.push(...Ticket.data.data.map((item, index) =>
-            createData(item.id, item.title, item.created_at, item.updated_at, <Button variant="contained" sx={{
+            createData(item.id, item.title, item.created_at, item.updated_at,item.user, <Button variant="contained" sx={{
                 borderRadius: "20px",
-                bgcolor: alpha('#0BF04B', 0.3),
-                color: "#23833E"
+                bgcolor:backgroundColors(item.status) ,
+                color: colors(item.status)
             }}>{item.status}</Button>),
         ));
     }
+
+
 
     return (
         <Box position="absolute" display="flex" justifyContent="center" alignItems="center" height="92vh" sx={{

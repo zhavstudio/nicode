@@ -25,7 +25,7 @@ export default function TicketTab(){
         //     width: '100%',
         //     '@media (min-width: 900px)': {width: '84%',}
         //     ,}}>
-            <Box sx={{ width: '100%', typography: 'body1',p:2 }}>
+            <Box sx={{ width: '100%', typography: 'body1',p:{xs:0,md:2} }}>
                 <TabContext value={value}>
                     <Box sx={{display:"flex",justifyContent:"center", borderBottom: 2, borderColor: theme.palette.Primary[30] }}>
                         <TabList onChange={handleChange} aria-label="lab API tabs example">
@@ -33,8 +33,8 @@ export default function TicketTab(){
                             <Tab label="تیکت های متصل شده" value="2" />
                         </TabList>
                     </Box>
-                    <TabPanel value="1" ><UnAssignedTicket /></TabPanel>
-                    <TabPanel value="2" ><AssignedTicket/></TabPanel>
+                    <TabPanel sx={{p:0,pt:1}} value="1" ><UnAssignedTicket /></TabPanel>
+                    <TabPanel sx={{p:0,pt:1}} value="2" ><AssignedTicket/></TabPanel>
                 </TabContext>
             </Box>
         // </Box>

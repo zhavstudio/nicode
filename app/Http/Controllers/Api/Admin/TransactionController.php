@@ -1,12 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Api\User;
+namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Requests\StoreTransactionRequest;
-use App\Http\Requests\UpdateTransactionRequest;
 use App\Http\Resources\Api\User\TransactionResource;
-use App\Http\Resources\Api\User\WalletResource;
 use App\Models\Transaction;
+use Illuminate\Http\Request;
 
 class TransactionController
 {
@@ -15,7 +13,7 @@ class TransactionController
      */
     public function index()
     {
-        return new WalletResource(auth()->user()->wallet()->first());
+        return TransactionResource::collection(Transaction::all());
     }
 
     /**
@@ -29,7 +27,7 @@ class TransactionController
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTransactionRequest $request)
+    public function store(Request $request)
     {
         //
     }
@@ -37,7 +35,7 @@ class TransactionController
     /**
      * Display the specified resource.
      */
-    public function show(Transaction $transaction)
+    public function show(string $id)
     {
         //
     }
@@ -45,7 +43,7 @@ class TransactionController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Transaction $transaction)
+    public function edit(string $id)
     {
         //
     }
@@ -53,7 +51,7 @@ class TransactionController
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTransactionRequest $request, Transaction $transaction)
+    public function update(Request $request, string $id)
     {
         //
     }
@@ -61,7 +59,7 @@ class TransactionController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Transaction $transaction)
+    public function destroy(string $id)
     {
         //
     }

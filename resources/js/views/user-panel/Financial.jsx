@@ -225,7 +225,7 @@ export default function Financial() {
             width: '100%',
             '@media (min-width: 900px)': {width: '84%',}
             ,
-        }} marginTop={{xs: 9, md: 7}}>
+        }} marginTop={{xs: 9, md: 14}}>
             <Grid container spacing={2} sx={{display: "flex", justifyContent: "center"}}>
                 <Grid item md={6} sx={{mb:5,display: isXsScreen ? "none" : "flex", justifyContent: "flex-end"}}>
                     <Box width="551px" height="266px" display="flex" flexDirection="column" alignItems="center"

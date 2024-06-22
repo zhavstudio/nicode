@@ -17,6 +17,7 @@ class UserTicketResource extends JsonResource
     {
         return [
             "id"         => $this->id,
+            "user"       => $this->user->phone_number,
             "title"      => $this->title,
             "priority"   => $this->priority->description,
             "status"     => $this->status->description,

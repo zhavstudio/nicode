@@ -85,6 +85,7 @@ class MessageController
             'id'          => auth()->user()->id,
             'phone'       => $ticket->user->phone_number,
             'messages' => $messages,
+            'status'   => $ticket->status,
         ];
     }
 

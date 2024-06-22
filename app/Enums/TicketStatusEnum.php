@@ -21,11 +21,11 @@ final class TicketStatusEnum extends Enum
     public static function getDescription(mixed $value): string
     {
         return match ($value) {
-            self::new => 'New',
-            self::pending => 'Pending',
-            self::answered => 'Answered',
+            self::new => 'جدید',
+            self::pending => 'در انتظار',
+            self::answered => 'پاسخ داده شده',
             self::rating => 'Rating',
-            self::closed => 'Closed',
+            self::closed => 'بسته',
             default => self::getKey($value),
         };
     }
