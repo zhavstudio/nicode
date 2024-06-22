@@ -108,7 +108,7 @@ export default function TicketChat(){
         <Box position="absolute" dir="rtl" display="flex" justifyContent="center" alignItems="center" height="92vh"   sx={{
             width: '100%',
             '@media (min-width: 900px)': {width: '84%',}
-            ,}} marginTop={{xs:9,md:7}} p={{xs:1,md:7}} >
+            ,}} marginTop={{xs:6,md:7}} p={{xs:1,md:7}} >
             <Snackbar
                 open={openSnack}
                 autoHideDuration={6000}
@@ -127,7 +127,7 @@ export default function TicketChat(){
                     {message}
                 </Alert>
             </Snackbar>
-         <Grid item display="flex" p={{xs:1,md:3}} height={{xs:"83%",md:"563px"}} flexDirection="column" boxShadow={3} borderRadius="20px" bgcolor="#F4F4F4"  width="100%">
+         <Grid item display="flex" p={{xs:1,md:3}} height="auto" flexDirection="column" boxShadow={3} borderRadius="20px" bgcolor="#F4F4F4"  width="100%">
              <Box display="flex" justifyContent="space-between" width="100%">
                  <Typography sx={{height:"10%"}}>
                      تيكت باز شده در{Messages?.data?.create}
@@ -138,7 +138,7 @@ export default function TicketChat(){
              </Box>
              <Divider sx={{mt:"10px"}}/>
             <Box display="flex" flexDirection="row" width="100%">
-                <Box display="flex" flexDirection="column" width="60%">
+                <Box display="flex" flexDirection="column" width={{xs:"100%",md:"60%"}}>
                     <Typography fontWeight="900">
                         {Messages?.data?.ticket_title}
                     </Typography>
@@ -171,6 +171,9 @@ export default function TicketChat(){
                                             maxWidth="50%"
                                             p={2}
                                             mt={1}
+                                            style={{
+                                                wordBreak: 'break-word',
+                                            }}
                                         >
                                             {item.text}
                                         </Typography>

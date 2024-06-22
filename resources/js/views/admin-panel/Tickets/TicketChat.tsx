@@ -196,6 +196,9 @@ export default function TicketChat() {
                                                 maxWidth="50%"
                                                 p={2}
                                                 mt={1}
+                                                style={{
+                                                    wordBreak: 'break-word',
+                                                }}
                                             >
                                                 {item.text}
                                             </Typography>
