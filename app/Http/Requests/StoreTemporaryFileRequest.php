@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class MessageRequest extends FormRequest
+class StoreTemporaryFileRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +22,7 @@ class MessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "text"     =>    ["nullable"],
-            "audio"    =>    ["min:1"],
-            "type"     =>    ["string"],
-            "file"     =>    ["min:1"]
+            'file' => ["required"],
         ];
     }
 }

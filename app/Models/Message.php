@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * @property integer $user_id
@@ -41,11 +42,8 @@ class Message extends Model
      *
      * @var array
      */
-    protected $fillable = [
-        'id',
-        'user_id',
-        'text'
-    ];
+    protected $fillable = ['ticket_id', 'user_id', 'text', 'audio', 'type'];
+
 
     /**
      * The attributes that aren't mass assignable.
@@ -82,5 +80,13 @@ class Message extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the images for this community.
+     */
+    public function images(): MorphMany|Image|array
+    {
+        return $this->morphMany(Image::class, 'parentable');
     }
 }

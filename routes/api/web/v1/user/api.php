@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\User\TransactionController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\TempController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -43,6 +44,10 @@ Route::name("api.web.v1.user.")->group(function () {
     Route::get('transaction-list', [TransactionController::class, 'index'])->name('transaction-list');
 
     Route::post('transaction', [PaymentController::class, 'store'])->name('transaction');
+
     Route::get('verify-payment', [PaymentController::class, 'verifyPayment'])->name('verifyPayment');
+
+    Route::apiResource("temporary-file", TempController::class)->only("store");
+
 
 });

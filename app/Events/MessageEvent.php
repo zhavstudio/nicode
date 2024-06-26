@@ -30,7 +30,6 @@ class MessageEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         $ticketId = $this->message['ticket_id'];
-
         return [
             new PrivateChannel("messages.".$ticketId),
         ];

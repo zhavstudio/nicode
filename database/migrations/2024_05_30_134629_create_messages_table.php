@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignIdFor(Ticket::class);
             $table->foreignIdFor(User::class);
             $table->text('text')->nullable();
+            $table->text('audio')->nullable(); // New column for audio data
+            $table->string('type')->default('text'); // New column to indicate message type
             $table->timestamps();
         });
     }

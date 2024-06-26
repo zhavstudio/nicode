@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Admin\UserController;
 
 use App\Http\Controllers\Api\Admin\MessageController;
 use App\Http\Controllers\Api\TicketController;
+use App\Http\Controllers\TempController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,5 +40,8 @@ Route::name("api.web.v1.admin.")->group(function () {
     Route::get('user-details/{id}',[UserController::class,'details'])->name('details');
 
     Route::get('transaction-list', [TransactionController::class, 'index'])->name('transaction-list');
+
+    Route::apiResource("temporary-file", TempController::class)->only("store");
+
 
 });
