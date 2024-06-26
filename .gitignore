@@ -18,3 +18,7 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/resources/js/views/admin-panel/routes.json
+/resources/js/views/user-panel/routes.json
+composer.lock
+nicode.zip
