@@ -164,10 +164,7 @@ export default function Financial() {
 
     const postTransaction = useMutation('postTransaction', async(data)=>{
         const response =  await axios.post(
-            route(
-                "api.web.v1.user.transaction"
-            ),
-            data
+            route("api.web.v1.user.transaction", {}, 1), data
         );
         // Check if the response contains an HTML page
         if (response.headers['content-type'].includes('text/html')) {
@@ -221,9 +218,9 @@ export default function Financial() {
     }
 
     return (
-        <Box display="flex" justifyContent="center" alignItems="center" height="92vh" sx={{
+        <Box display="flex" alignItems="flex-start" height="92vh" sx={{
             width: '100%',
-            '@media (min-width: 900px)': {width: '84%',}
+            '@media (min-width: 900px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
             ,
         }} marginTop={{xs: 9, md: 14}}>
             <Grid container spacing={2} sx={{display: "flex", justifyContent: "center"}}>

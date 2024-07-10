@@ -14,6 +14,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "morilog/jalali": "^3.4",
+        "mrhmh/sms-rahyab": "^0.2.0",
         "santigarcor/laratrust": "^8.3",
         "shetabit/payment": "^5.8",
         "silviolleite/laravelpwa": "^2.0"

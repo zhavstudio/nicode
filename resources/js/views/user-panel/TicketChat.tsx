@@ -1,11 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {
+    alpha,
     Avatar,
     Box,
     Button,
     Divider,
     FormControl,
-    Grid, IconButton, InputAdornment,
+    Grid, Icon, IconButton, InputAdornment,
     InputLabel, Menu,
     MenuItem, Modal,
     Select, Snackbar,
@@ -44,13 +45,15 @@ export default function TicketChat(){
         register,
         handleSubmit,
         setValue,
+        reset,
         formState: {errors, isValid},
     } = useForm({mode: "onBlur"});
     const onSubmit = (data) => {
-        console.log(inputValue)
+        setPreview(null)
         sendMessage.mutate(data, {
             onSuccess: () => {
                 setInputValue('');
+                reset()
             }
         });
     };
@@ -61,10 +64,9 @@ export default function TicketChat(){
     };
 
     function onClickShowEmoji(emojiData: EmojiClickData, event: MouseEvent) {
-        setInputValue(
-            (inputValue) =>
-                inputValue + (emojiData.isCustom ? emojiData.unified : emojiData.emoji)
-        );
+        const newInputValue = inputValue + (emojiData.isCustom ? emojiData.unified : emojiData.emoji);
+        setInputValue(newInputValue);
+        setValue("text", newInputValue); // Update the form value
     }
 
     const openEmoji = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -84,14 +86,17 @@ export default function TicketChat(){
             return response.data;
         }, {
             onSuccess: (data) => {
-                setOpenSnack(true);
-                setStatus("success");
-                setMessage("تیکت ارسال شد");
+                // setOpenSnack(true);
+                // setStatus("success");
+                // setMessage("تیکت ارسال شد");
+                setTimeout(()=>{
+                    scrollToBottom();
+                },3000)
             },
             onError: () => {
                 setOpenSnack(true);
                 setStatus("error");
-                setMessage("ارسال تیکت مشکل مواجه شد");
+                setMessage("ارسال تیکت با مشکل مواجه شد");
             },
             onSettled: () => {
             },
@@ -112,6 +117,7 @@ export default function TicketChat(){
             setTimeout(()=>{
                 scrollToBottom();
             },1000)
+            SetTicketClose(data?.status === 4)
         }});
 
     const TempFiles = useMutation(async (formData) => {
@@ -155,7 +161,6 @@ export default function TicketChat(){
         return () => {
             window.Echo.leave("messages");
         }
-
     }, []);
 
     //Audio message config
@@ -209,6 +214,11 @@ export default function TicketChat(){
                         tempId: result.id // Assuming the server returns an id for the temporary file
                     }
                 ]);
+                setPreview({
+                    file: file,
+                    url: URL.createObjectURL(file),
+                })
+
                 setValue("file", result)
                 setValue("type", "image")
             } catch (error) {
@@ -227,19 +237,29 @@ export default function TicketChat(){
 
     const handleCloseModal = () => {
         setSelectedImage(null);
+        setPreview(null)
     };
 
     const handleclear = (url) => {
         setFile(prevFiles => prevFiles.filter(file => file.url !== url));
     }
+    const [ticketClose, SetTicketClose] = React.useState(false);
     const [file, setFile] = React.useState([]);
+    const [preview, setPreview] = React.useState();
 
+    const handleKeyDown = (event) => {
+        console.log(event.key)
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevents default enter behavior (new line)
+            handleSubmit(onSubmit)();
+        }
+    };
 
     return(
-        <Box position="absolute" dir="rtl" display="flex" justifyContent="center" alignItems="center" height="92vh"   sx={{
+        <Box position="absolute" onKeyDown={handleKeyDown} dir="rtl"  height="92vh"   sx={{
             width: '100%',
-            '@media (min-width: 900px)': {width: '84%',}
-            ,}} marginTop={{xs:6,md:7}} p={{xs:1,md:7}} >
+            '@media (min-width: 900px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
+            ,}} marginTop={{xs:9,md:7}} p={{xs:1,md:7}} >
             <Snackbar
                 open={openSnack}
                 autoHideDuration={6000}
@@ -258,8 +278,9 @@ export default function TicketChat(){
                     {message}
                 </Alert>
             </Snackbar>
-         <Grid item display="flex" p={{xs:1,md:3}} height="auto" flexDirection="column" boxShadow={3} borderRadius="20px" bgcolor="#F4F4F4"  width="100%">
-             <Box display="flex" justifyContent="space-between" width="100%">
+            <Grid item display="flex" p={{xs: 1, md: 3}} height="auto" flexDirection="column"
+                  boxShadow={3} borderRadius="20px" bgcolor="#F4F4F4" width="100%">
+                <Box display="flex" justifyContent="space-between" width="100%">
                  <Typography sx={{height:"10%"}}>
                      تيكت باز شده در{Messages?.data?.create}
                  </Typography>
@@ -274,7 +295,7 @@ export default function TicketChat(){
                         {Messages?.data?.ticket_title}
                     </Typography>
                     <Typography>آخرین آپدیت در{Messages?.data?.update}</Typography>
-                    <Box sx={{ height: {xs:"300px",md:"363px"}, overflowY: 'auto' }}>
+                    <Box sx={{height: {xs: "640px", md: "363px"},'@media (min-width: 1600px)': {height: '700px',}, overflowY: 'auto'}}>
                         <Box width="100%" ref={chatBoxRef} display="flex" justifyContent="flex-end" flexDirection="column" p={1}>
                             {chat?.messages?.map((item, index) => (
                                 item.is_sender ?
@@ -360,13 +381,19 @@ export default function TicketChat(){
                                     </Box>)
                             ))}
                         </Box>
+                        <Box width="70%" bgcolor={alpha('#B80B0B', 0.3)} height="100px" borderRadius="20px"
+                             display={ticketClose ? "flex" : "none"} justifyContent="center" alignItems="center">
+                            <Typography>
+                                تیکت بسته شده
+                            </Typography>
+                        </Box>
                     </Box>
                     <TextField
                         value={inputValue}
                         onChange={(e) => {
-                            setInputValue(e.target.value),
-                                setValue("text", inputValue)
-
+                            const newValue = e.target.value;
+                            setInputValue(newValue);
+                            setValue("text", newValue);
                         }}
                         sx={{
                             '& .MuiOutlinedInput-root': {
@@ -388,7 +415,7 @@ export default function TicketChat(){
                                         onClick={handleSubmit(onSubmit)}
                                         position="start"
                                     >
-                                        <IconButton>
+                                        <IconButton disabled={ticketClose}>
                                             <SendIcon/>
                                         </IconButton>
                                     </InputAdornment>
@@ -410,6 +437,7 @@ export default function TicketChat(){
                                                     aria-haspopup="true"
                                                     aria-expanded={openE ? 'true' : undefined}
                                                     onClick={openEmoji}
+                                                    disabled={ticketClose}
                                         >
                                             <SentimentSatisfiedOutlinedIcon/>
                                         </IconButton>
@@ -424,7 +452,7 @@ export default function TicketChat(){
                                             'aria-labelledby': 'basic-button',
                                         }}
                                     >
-                                        <MenuItem sx={{padding: 0}}>
+                                        <MenuItem sx={{padding: 0}} disabled={ticketClose}>
                                             <EmojiPicker height={500}
                                                          onEmojiClick={onClickShowEmoji}/>
                                         </MenuItem>
@@ -433,7 +461,7 @@ export default function TicketChat(){
                                         <input accept="image/*" id="icon-button-file" type="file"
                                                style={{display: "none"}} onChange={handleChange}/>
                                         <label htmlFor="icon-button-file">
-                                            <IconButton color="primary" component="span">
+                                            <IconButton color="primary" component="span" disabled={ticketClose}>
                                                 <AttachFileIcon/>
                                             </IconButton>
                                         </label>
@@ -447,11 +475,11 @@ export default function TicketChat(){
                     <Typography fontWeight="900" mt={2}>جزییات</Typography>
                     <Divider sx={{mt: "10px"}}/>
                     <Typography mt={2} fontWeight="500">فایل های پیوست</Typography>
-                    <Box display="flex" gap={2} flexDirection="column" width="463px" sx={{height: {xs: "300px", md: "363px"}, overflowY: 'auto'}}>
+                    <Box display="flex" gap={2} flexDirection="column" width="463px" sx={{height: {xs: "300px", md: "363px"},'@media (min-width: 1600px)': {height: '700px',}, overflowY: 'auto'}}>
                         {file?.map((item, index) =>
                             <Box display="flex" flexDirection="row" width="100%" height="40%" alignItems="center" gap={2}>
                                 <img style={{
-                                    objectFit: "cover",
+                                    objectFit: "contain",
                                     width: "50%",
                                     height: "100%",
                                     aspectRatio: "1/1",
@@ -491,6 +519,53 @@ export default function TicketChat(){
                                     objectFit: 'contain',
                                 }}
                             />
+                        </Box>
+                    </Modal>
+                    <Modal
+                        open={preview}
+                        onClose={handleCloseModal}
+                        aria-labelledby="image-preview"
+                        aria-describedby="full-screen-image-preview"
+                    >
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: {xs:"70vw",md:'30vw'}, // Reduced from 40vw to 30vw
+                                maxHeight: '90vh',
+                                backgroundColor: "#F4F4F4",
+                                borderRadius: "20px",
+                                display: "flex",
+                                flexDirection: "column", // Changed to column for better layout
+                                alignItems: "center", // Center items horizontally
+                                padding: "20px", // Added padding for better spacing
+                            }}
+                        >
+                            <img
+                                src={preview?.url}
+                                alt="Full screen preview"
+                                style={{
+                                    width: '100%', // Changed to 100% to fit the reduced box width
+                                    height: 'auto', // Changed to auto to maintain aspect ratio
+                                    maxHeight: '70vh', // Added max height to ensure it fits in the box
+                                    objectFit: 'contain',
+                                    borderRadius: "20px",
+                                    marginBottom: "10px" // Added margin to separate from the button
+                                }}
+                            />
+                            <IconButton onClick={handleSubmit(onSubmit)}
+                                        sx={{
+                                    backgroundColor: "#E0E0E0", // Added a background color
+                                    '&:hover': {
+                                        backgroundColor: "#D0D0D0", // Darker shade on hover
+                                    },
+                                    padding: "12px", // Increased padding for a larger button
+                                }}
+                            >
+                                <SendIcon sx={{ fontSize: "1.5rem" }} /> {/* Increased icon size */}
+                            </IconButton>
                         </Box>
                     </Modal>
                 </Box>

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('verify-payment', [PaymentController::class, 'verifyPayment'])->name('verifyPayment');
+Route::get('verify-payment/app', [PaymentController::class, 'verifyPaymentApp'])->name('verifyPaymentApp');
 
 Route::get('/{path?}/{path2?}/{path3?}/{path4?}', function () {
     return view('app');

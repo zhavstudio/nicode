@@ -319,7 +319,8 @@ return [
 
             'mode' => 'normal', // can be normal, sandbox, zaringate
             'merchantId' => env('ZARINPAL_MERCHANT_ID'),
-            'callbackUrl' => env('ZARINPAL_CALLBACKURL'),
+            'callbackUrlWeb' => env('ZARINPAL_CALLBACKURL_WEB'),
+            'callbackUrlApp' => env('ZARINPAL_CALLBACKURL_APP'),
             'description' => 'payment using zarinpal',
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],

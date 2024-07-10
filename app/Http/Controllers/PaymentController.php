@@ -17,18 +17,30 @@ class PaymentController
         $request->validate([
         'amount' => 'required'
         ]);
+
         $invoice = new Invoice();
 
         $invoice->amount($request['amount']);
 
-        return Payment::purchase($invoice, function($driver, $transactionID) use($request) {
-            $transaction = new Transaction([
-                'amount' => $request['amount'],
-                'transactionID' => $transactionID
-            ]);
-            $transaction->wallet()->associate(auth()->user()->wallet);
-            $transaction->save();
-        })->pay()->render();
+        if ($request->input('page') == 1){
+            return Payment::callbackUrl(config('payment.drivers.zarinpal.callbackUrlWeb'))->purchase($invoice, function($driver, $transactionID) use($request) {
+                $transaction = new Transaction([
+                    'amount' => $request['amount'],
+                    'transactionID' => $transactionID
+                ]);
+                $transaction->wallet()->associate(auth()->user()->wallet);
+                $transaction->save();
+            })->pay()->render();
+        }else {
+            return Payment::callbackUrl(config('payment.drivers.zarinpal.callbackUrlApp'))->purchase($invoice, function($driver, $transactionID) use($request) {
+                $transaction = new Transaction([
+                    'amount' => $request['amount'],
+                    'transactionID' => $transactionID
+                ]);
+                $transaction->wallet()->associate(auth()->user()->wallet);
+                $transaction->save();
+            })->pay()->render();
+        }
 
     }
 
@@ -54,6 +66,33 @@ class PaymentController
             $transaction->status = TransactionStatusEnum::failed;
             $transaction->save();
             return view('payment.failed-payment')->with([
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
+
+    public function verifyPaymentApp(Request $request)
+    {
+        $transaction =  Transaction::where('transactionID', '=', $request['Authority'])->first();
+        try {
+            $receipt = Payment::amount($transaction->amount)->transactionId($transaction->transactionID)->verify();
+            $transaction->status = TransactionStatusEnum::success;
+            $transaction->referenceID = $receipt->getReferenceId();
+            $transaction->save();
+
+            return view('payment.app.success-payment')->with([
+                'referenceId'  => $receipt->getReferenceId()
+            ]);
+
+        } catch (InvalidPaymentException $exception) {
+            /**
+            when payment is not verified, it will throw an exception.
+            We can catch the exception to handle invalid payments.
+            getMessage method, returns a suitable message that can be used in user interface.
+             **/
+            $transaction->status = TransactionStatusEnum::failed;
+            $transaction->save();
+            return view('payment.app.failed-payment')->with([
                 'message' => $exception->getMessage()
             ]);
         }
