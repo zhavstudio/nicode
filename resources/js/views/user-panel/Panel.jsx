@@ -49,7 +49,7 @@ const drawerItems = [
 ];
 
 
-const drawerWidth = 240;
+const drawerWidth = 150;
 
 
 export default function Panel(props) {
@@ -124,7 +124,8 @@ export default function Panel(props) {
             <AppBar
                 position="fixed"
                 sx={{
-                    width: {sm: '78%'},
+                    '@media (min-width: 1600px)': {width: '90%',},
+                    width: {sm: '83%'},
                     mr: {sm: `${drawerWidth + 48}px`},
                     borderRadius: '24px',
                     backgroundColor: theme.palette.secondary.main,

@@ -119,10 +119,10 @@ export default function AllTransactions() {
     }
 
     return (
-        <Box position="absolute" display="flex" justifyContent="center" alignItems="center" height="92vh" sx={{
+        <Box position="absolute" height="92vh" sx={{
             width: '100%',
-            '@media (min-width: 900px)': {width: '84%',}
-            ,
+            '@media (min-width: 900px)': {width: '91%',}
+            ,'@media (min-width: 1600px)': {width: '94.5%',}
         }} marginTop={{xs: 9, md: 7}}>
             <Grid item width="100%" p={{xs: 2, md: 7}}>
                 <Paper sx={{width: '100%', overflow: 'hidden', borderRadius: "20px", bgcolor: "#F4F4F4", boxShadow: 3}}>

@@ -40,4 +40,13 @@ return [
         'zarinGate' => false,
         'sandbox' => false,
     ],
+    'sms_rahyab' => [
+        'company'  => env('SMS_RAHYAB_COMPANY'),
+        'host'     => env('SMS_RAHYAB_HOST'),
+        'port'     => env('SMS_RAHYAB_PORT'),
+        'username' => env('SMS_RAHYAB_USERNAME'),
+        'password' => env('SMS_RAHYAB_PASSWORD'),
+        'sender'   => env('SMS_RAHYAB_SENDER'),
+        'token'    => env('SMS_RAHYAB_TOKEN'),
+    ],
 ];

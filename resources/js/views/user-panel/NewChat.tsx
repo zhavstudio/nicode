@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {
-    alpha,
     Avatar,
     Box,
     Button,
@@ -13,25 +12,25 @@ import {
     TextareaAutosize, TextField,
     Typography
 } from "@mui/material";
-import theme from "./../../../Custom";
+import theme from "./../../Custom";
 import SendIcon from '@mui/icons-material/Send';
-import axios from './../../../axiosConfig';
+import axios from './../../axiosConfig';
 import {useMutation, useQuery} from "react-query";
-import {route} from './../helpers'
+import {route} from './helpers'
 import {useParams} from "react-router-dom";
 import {Alert} from "@mui/lab";
-import {AudioRecorder} from 'react-audio-voice-recorder';
+import {useForm} from "react-hook-form";
 import EmojiPicker, {EmojiClickData} from "emoji-picker-react";
 import SentimentSatisfiedOutlinedIcon from "@mui/icons-material/SentimentSatisfiedOutlined";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ClearIcon from '@mui/icons-material/Clear';
-import {useForm} from "react-hook-form";
+import {AudioRecorder} from "react-audio-voice-recorder";
 
-export default function TicketChat() {
 
+export default function TicketChat(){
+    const [chat, setChat] = React.useState([]);
     const [age, setAge] = React.useState('');
     const [inputValue, setInputValue] = useState('');
-    const [chat, setChat] = React.useState([]);
     const params = useParams();
     const chatBoxRef = useRef(null);
     const [openSnack, setOpenSnack] = React.useState(false);
@@ -49,7 +48,6 @@ export default function TicketChat() {
         formState: {errors, isValid},
     } = useForm({mode: "onBlur"});
     const onSubmit = (data) => {
-        setPreview(null)
         console.log(inputValue)
         sendMessage.mutate(data, {
             onSuccess: () => {
@@ -75,7 +73,6 @@ export default function TicketChat() {
     };
 
 
-    //Scroll auto
     const scrollToBottom = () => {
         console.log("akbar")
         if (chatBoxRef.current) {
@@ -83,10 +80,8 @@ export default function TicketChat() {
         }
     };
 
-    //data fetching
     const sendMessage = useMutation(async (data) => {
-            console.log(data)
-            const response = await axios.post(route("api.web.v1.admin.message", {ticket: params.id}), data);
+            const response = await axios.post(route("api.web.v1.user.message",{ticket:params.id}),data);
             return response.data;
         }, {
             onSuccess: (data) => {
@@ -100,27 +95,7 @@ export default function TicketChat() {
             onError: () => {
                 setOpenSnack(true);
                 setStatus("error");
-                setMessage("ارسال با مشکل مواجه شد");
-            },
-            onSettled: () => {
-            },
-        }
-    )
-
-    const closeTicket = useMutation(async (data) => {
-            const response = await axios.put(route("api.web.v1.admin.close", {ticket: params.id}));
-            return response.data;
-        }, {
-            onSuccess: (data) => {
-                setOpenSnack(true);
-                setStatus("success");
-                setMessage("تیکت بسته شد");
-                SetTicketClose(true)
-            },
-            onError: () => {
-                setOpenSnack(true);
-                setStatus("error");
-                setMessage("بستن تیکت با مشکل مواجه شد");
+                setMessage("ارسال تیکت مشکل مواجه شد");
             },
             onSettled: () => {
             },
@@ -129,25 +104,23 @@ export default function TicketChat() {
 
 
     const Messages = useQuery("Messages", async () => {
-        const {data} = await axios.get(
-            route("api.web.v1.admin.messages", {ticket: params.id})
+        const { data } = await axios.get(
+            route("api.web.v1.user.messages",{ticket:params.id})
         );
         // Messages.data = data.data;
         return data;
-    }, {
+    },{
         onSuccess: (data) => {
             setChat(data)
             setFile(data.image_messages)
-            setTimeout(() => {
+            setTimeout(()=>{
                 scrollToBottom();
-            }, 1000)
-            SetTicketClose(data?.status === 4)
-        }
-    });
+            },1000)
+        }});
 
     const TempFiles = useMutation(async (formData) => {
             console.log(formData)
-            const response = await axios.post(route("api.web.v1.admin.temporary-file.store"), formData, {
+            const response = await axios.post(route("api.web.v1.user.temporary-file.store"), formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -165,11 +138,9 @@ export default function TicketChat() {
         }
     )
 
-    //WebSocket config
     const connectWebSocket = () => {
         window.Echo.private(`messages.${params.id}`)
             .listen('MessageEvent', (data) => {
-                console.log(data)
                 setChat(prev => {
                     return {
                         ...prev,
@@ -179,16 +150,15 @@ export default function TicketChat() {
                         }]
                     };
                 });
-            })
-
+            });
     };
+
     useEffect(() => {
         connectWebSocket();
 
         return () => {
             window.Echo.leave("messages");
         }
-
     }, []);
 
     //Audio message config
@@ -242,11 +212,6 @@ export default function TicketChat() {
                         tempId: result.id // Assuming the server returns an id for the temporary file
                     }
                 ]);
-                setPreview({
-                    file: file,
-                    url: URL.createObjectURL(file),
-                })
-
                 setValue("file", result)
                 setValue("type", "image")
             } catch (error) {
@@ -265,72 +230,55 @@ export default function TicketChat() {
 
     const handleCloseModal = () => {
         setSelectedImage(null);
-        setPreview(null)
     };
 
-    // const handleclear = (url) => {
-    //     setFile(prevFiles => prevFiles.filter(file => file.url !== url));
-    // }
-
-    //close Ticket
-    const [ticketClose, SetTicketClose] = React.useState(false);
+    const handleclear = (url) => {
+        setFile(prevFiles => prevFiles.filter(file => file.url !== url));
+    }
     const [file, setFile] = React.useState([]);
-    const [preview, setPreview] = React.useState();
 
-    const handleKeyDown = (event) => {
-        console.log(event.key)
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Prevents default enter behavior (new line)
-            handleSubmit(onSubmit)();
-        }
-    };
 
-    return (
-        <Box position="absolute" onKeyDown={handleKeyDown} dir="rtl" height="92vh"
-             sx={{
-                 width: '100%',
-                 '@media (min-width: 900px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
-                 ,
-             }} marginTop={{xs: 9, md: 7}} p={{xs: 1, md: 7}}>
+    return(
+        <Box position="absolute" dir="rtl" display="flex" justifyContent="center" alignItems="center" height="92vh"   sx={{
+            width: '100%',
+            '@media (min-width: 900px)': {width: '84%',}
+            ,}} marginTop={{xs:6,md:7}} p={{xs:1,md:7}} >
             <Snackbar
                 open={openSnack}
                 autoHideDuration={6000}
                 onClose={() => {
                     setOpenSnack(false);
                 }}
-                anchorOrigin={{vertical: "top", horizontal: "right"}}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
             >
                 <Alert
                     onClose={() => {
                         setOpenSnack(false);
                     }}
                     severity={status}
-                    sx={{width: "100%"}}
+                    sx={{ width: "100%" }}
                 >
                     {message}
                 </Alert>
             </Snackbar>
-            <Grid item display="flex" p={{xs: 1, md: 3}} height="auto" flexDirection="column"
-                  boxShadow={3} borderRadius="20px" bgcolor="#F4F4F4" width="100%">
+            <Grid item display="flex" p={{xs:1,md:3}} height={{xs: "calc(100vh - 90px)", md: "auto"}} mt={{xs:7,md:0}} flexDirection="column" boxShadow={3} borderRadius="20px" bgcolor="#F4F4F4"  width="100%">
                 <Box display="flex" justifyContent="space-between" width="100%">
-                    <Typography sx={{height: "10%"}}>
+                    <Typography sx={{height:"10%"}}>
                         تيكت باز شده در{Messages?.data?.create}
                     </Typography>
-                    <Button disabled={ticketClose} onClick={() => closeTicket.mutate()} variant="contained"
-                            sx={{width: "10%", pl: 2, borderRadius: "20px"}}>
-                        بستن تیکت
-                    </Button>
+                    {/*<Button  variant="contained" sx={{width:"10%",pl:2,borderRadius:"20px"}}>*/}
+                    {/*   بستن تیکت*/}
+                    {/*</Button>*/}
                 </Box>
-                <Divider sx={{mt: "10px"}}/>
+                <Divider sx={{mt:"10px"}}/>
                 <Box display="flex" flexDirection="row" width="100%">
-                    <Box display="flex" flexDirection="column" width={{xs: "100%", md: "60%"}}>
+                    <Box display="flex" flexDirection="column" width={{xs:"100%",md:"60%"}}>
                         <Typography fontWeight="900">
                             {Messages?.data?.ticket_title}
                         </Typography>
                         <Typography>آخرین آپدیت در{Messages?.data?.update}</Typography>
-                        <Box sx={{height: {xs: "640px", md: "363px"},'@media (min-width: 1600px)': {height: '700px',}, overflowY: 'auto'}}>
-                            <Box width="100%" ref={chatBoxRef} display="flex" justifyContent="flex-end"
-                                 flexDirection="column" p={1}>
+                        <Box sx={{ height: {xs: "calc(100vh - 260px)",md:"363px"}, overflowY: 'auto' }}>
+                            <Box width="100%" ref={chatBoxRef} display="flex" justifyContent="flex-end" flexDirection="column" p={1}>
                                 {chat?.messages?.map((item, index) => (
                                     item.is_sender ?
                                         (<Box display="flex" justifyContent="start" flexDirection="row" gap={1}
@@ -385,45 +333,38 @@ export default function TicketChat() {
                                                 <>
                                                     <Typography fontSize={10} color="gray">{item.time}</Typography>
                                                     <img src={item.url} style={{
-                                                    objectFit: "cover",
-                                                    width: "50%",
-                                                    height: "50%",
-                                                    aspectRatio: "1/1",
-                                                    borderRadius: 20,
-                                                    margin: "2px"
-                                                }}
-                                                     onClick={() => handleImageClick(item.url)}
-                                                />
+                                                        objectFit: "cover",
+                                                        width: "50%",
+                                                        height: "50%",
+                                                        aspectRatio: "1/1",
+                                                        borderRadius: 20,
+                                                        margin: "2px"
+                                                    }}
+                                                         onClick={() => handleImageClick(item.url)}
+                                                    />
                                                 </>
                                                 : (
                                                     <>
                                                         <Typography mt={2.5} fontSize={10} color="gray">{item.time}</Typography>
                                                         <Typography
-                                                        bgcolor={theme.palette.Primary[20]}
-                                                        borderRadius="20px"
-                                                        maxWidth="50%"
-                                                        p={1}
-                                                        mt={1}
-                                                        style={{
-                                                            wordBreak: 'break-word',
-                                                        }}
-                                                    >
-                                                        {item.text}
-                                                    </Typography>
+                                                            bgcolor={theme.palette.Primary[20]}
+                                                            borderRadius="20px"
+                                                            maxWidth="50%"
+                                                            p={1}
+                                                            mt={1}
+                                                            style={{
+                                                                wordBreak: 'break-word',
+                                                            }}
+                                                        >
+                                                            {item.text}
+                                                        </Typography>
                                                     </>
                                                 )}
                                         </Box>)
                                 ))}
                             </Box>
-                            <Box width="70%" bgcolor={alpha('#B80B0B', 0.3)} height="100px" borderRadius="20px"
-                                 display={ticketClose ? "flex" : "none"} justifyContent="center" alignItems="center">
-                                <Typography>
-                                    تیکت بسته شده
-                                </Typography>
-                            </Box>
                         </Box>
                         <TextField
-                            disabled={ticketClose}
                             value={inputValue}
                             onChange={(e) => {
                                 const newValue = e.target.value;
@@ -450,7 +391,7 @@ export default function TicketChat() {
                                             onClick={handleSubmit(onSubmit)}
                                             position="start"
                                         >
-                                            <IconButton disabled={ticketClose}>
+                                            <IconButton>
                                                 <SendIcon/>
                                             </IconButton>
                                         </InputAdornment>
@@ -472,7 +413,6 @@ export default function TicketChat() {
                                                         aria-haspopup="true"
                                                         aria-expanded={openE ? 'true' : undefined}
                                                         onClick={openEmoji}
-                                                        disabled={ticketClose}
                                             >
                                                 <SentimentSatisfiedOutlinedIcon/>
                                             </IconButton>
@@ -487,7 +427,7 @@ export default function TicketChat() {
                                                 'aria-labelledby': 'basic-button',
                                             }}
                                         >
-                                            <MenuItem sx={{padding: 0}} disabled={ticketClose}>
+                                            <MenuItem sx={{padding: 0}}>
                                                 <EmojiPicker height={500}
                                                              onEmojiClick={onClickShowEmoji}/>
                                             </MenuItem>
@@ -496,7 +436,7 @@ export default function TicketChat() {
                                             <input accept="image/*" id="icon-button-file" type="file"
                                                    style={{display: "none"}} onChange={handleChange}/>
                                             <label htmlFor="icon-button-file">
-                                                <IconButton color="primary" component="span" disabled={ticketClose}>
+                                                <IconButton color="primary" component="span">
                                                     <AttachFileIcon/>
                                                 </IconButton>
                                             </label>
@@ -510,7 +450,7 @@ export default function TicketChat() {
                         <Typography fontWeight="900" mt={2}>جزییات</Typography>
                         <Divider sx={{mt: "10px"}}/>
                         <Typography mt={2} fontWeight="500">فایل های پیوست</Typography>
-                        <Box display="flex" gap={2} flexDirection="column" width="463px" sx={{height: {xs: "300px", md: "363px"},'@media (min-width: 1600px)': {height: '700px',}, overflowY: 'auto'}}>
+                        <Box display="flex" gap={2} flexDirection="column" width="463px" sx={{height: {xs: "300px", md: "363px"}, overflowY: 'auto'}}>
                             {file?.map((item, index) =>
                                 <Box display="flex" flexDirection="row" width="100%" height="40%" alignItems="center" gap={2}>
                                     <img style={{
@@ -554,53 +494,6 @@ export default function TicketChat() {
                                         objectFit: 'contain',
                                     }}
                                 />
-                            </Box>
-                        </Modal>
-                        <Modal
-                            open={preview}
-                            onClose={handleCloseModal}
-                            aria-labelledby="image-preview"
-                            aria-describedby="full-screen-image-preview"
-                        >
-                            <Box
-                                sx={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    width: {xs:"70vw",md:'30vw'}, // Reduced from 40vw to 30vw
-                                    maxHeight: '90vh',
-                                    backgroundColor: "#F4F4F4",
-                                    borderRadius: "20px",
-                                    display: "flex",
-                                    flexDirection: "column", // Changed to column for better layout
-                                    alignItems: "center", // Center items horizontally
-                                    padding: "20px", // Added padding for better spacing
-                                }}
-                            >
-                                <img
-                                    src={preview?.url}
-                                    alt="Full screen preview"
-                                    style={{
-                                        width: '100%', // Changed to 100% to fit the reduced box width
-                                        height: 'auto', // Changed to auto to maintain aspect ratio
-                                        maxHeight: '70vh', // Added max height to ensure it fits in the box
-                                        objectFit: 'contain',
-                                        borderRadius: "20px",
-                                        marginBottom: "10px" // Added margin to separate from the button
-                                    }}
-                                />
-                                <IconButton onClick={handleSubmit(onSubmit)}
-                                            sx={{
-                                                backgroundColor: "#E0E0E0", // Added a background color
-                                                '&:hover': {
-                                                    backgroundColor: "#D0D0D0", // Darker shade on hover
-                                                },
-                                                padding: "12px", // Increased padding for a larger button
-                                            }}
-                                >
-                                    <SendIcon sx={{ fontSize: "1.5rem" }} /> {/* Increased icon size */}
-                                </IconButton>
                             </Box>
                         </Modal>
                     </Box>

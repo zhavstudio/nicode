@@ -171,7 +171,7 @@ export default function Users() {
     return (
         <Box position="absolute" display="flex" justifyContent="center" alignItems="center" height="92vh"   sx={{
             width: '100%',
-            '@media (min-width: 900px)': {width: '85%',}
+            '@media (min-width: 900px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
             ,}} marginTop={{xs:9,md:6}}>
             <Snackbar
                 open={openSnack}

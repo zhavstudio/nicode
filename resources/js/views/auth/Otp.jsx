@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Box, Button, Divider, Grid, List, ListItem, ListItemText, TextField, Typography} from "@mui/material";
+import {Box, Button, Divider, Grid, List, ListItem, ListItemText, Snackbar, TextField, Typography} from "@mui/material";
 import theme from "./../../Custom"
 import logo from "./../../assets/logo.svg"
 import {MuiOtpInput} from 'mui-one-time-password-input'
@@ -12,7 +12,7 @@ import {useNavigate} from 'react-router-dom';
 import SaveIcon from '@mui/icons-material/Save';
 import {useDispatch, useSelector} from "react-redux";
 import {setAuth} from "@/redux/actions.js";
-import {LoadingButton} from "@mui/lab";
+import {Alert, LoadingButton} from "@mui/lab";
 
 
 export default function Otp() {
@@ -20,6 +20,10 @@ export default function Otp() {
     const [otp, setOtp] = React.useState('')
     const [disable, setDisable] = React.useState(true)
     const [loading, setLoading] = React.useState(false);
+    const [openSnack, setOpenSnack] = React.useState(false);
+    const [status, setStatus] = React.useState("success");
+    const [message, setMessage] = React.useState("This is a success message!");
+    const navigate = useNavigate();
 
     // function handleClick() {
     //     setLoading(true);
@@ -47,6 +51,9 @@ export default function Otp() {
                 }
             },
             onError: () => {
+                setOpenSnack(true);
+                setStatus("error");
+                setMessage("کد وارد شده اشتباه است");
             },
             onSettled: () => {
             },
@@ -61,9 +68,34 @@ export default function Otp() {
         setLoading(true)
     }
 
+    const handleKeyDown = (event) => {
+        console.log(event.key)
+        if (event.key === 'Enter') {
+            navigate('/panel', { replace: true });
+        }
+    };
+
 
     return (
-        <Grid container display='flex' flexDirection='row' justifyContent='space-between' p={{xs:0,md:5}}>
+        <Grid container display='flex' flexDirection='row' justifyContent='space-between' p={{xs:0,md:5}} onKeyDown={handleKeyDown}>
+            <Snackbar
+                open={openSnack}
+                autoHideDuration={6000}
+                onClose={() => {
+                    setOpenSnack(false);
+                }}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+                <Alert
+                    onClose={() => {
+                        setOpenSnack(false);
+                    }}
+                    severity={status}
+                    sx={{ width: "100%" }}
+                >
+                    {message}
+                </Alert>
+            </Snackbar>
             <Grid item xs={12} md={5} borderRadius={2} height={{md: '90vh', xs: '60vh'}}
                   bgcolor={theme.palette.Secondary.main}>
                 <Box

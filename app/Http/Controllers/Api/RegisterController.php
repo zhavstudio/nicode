@@ -20,8 +20,7 @@ class RegisterController
      */
     public function create(Request $request)
     {
-        info("App sign up " . serialize($request->all()));
-
+        $smsRequest = new RESTRahayabSMS();
         Validator::make($request->all(), [
             'phone_number' => ['required', 'string', 'max:11']
             //            'fname' => ['required', 'string', 'max:255'],

@@ -94,7 +94,10 @@ export default function UnAssignedTicket() {
     const rows = [];
 
     if (Ticket?.data?.data) {
-        rows.push(...Ticket.data.data.map((item, index) =>
+        const filtered = Ticket?.data?.data.filter((item,index)=>{
+            return item.message.length > 0
+        })
+        rows.push(...filtered.map((item, index) =>
             createData(item.id, item.title, item.created_at, item.updated_at,item.user, <Button variant="contained" sx={{
                 borderRadius: "20px",
                 bgcolor:backgroundColors(item.status) ,

@@ -36,16 +36,19 @@ class TicketController
         $ticketObj->user()->associate(auth()->user());
         $ticketObj->save();
 
-        $ticketRecord = new Message(["text" => $request->validated("message")]);
-        $ticketRecord->ticket()->associate($ticketObj);
-        $ticketRecord->user_id = auth()->user()->id;
-        $ticketRecord->save();
-        SendMessage::dispatch($ticketRecord);
+      if ($request->validated("message")){
+          $ticketRecord = new Message(["text" => $request->validated("message")]);
+          $ticketRecord->ticket()->associate($ticketObj);
+          $ticketRecord->user_id = auth()->user()->id;
+          $ticketRecord->save();
+          SendMessage::dispatch($ticketRecord);
 
-        return response()->json([
-            'success' => true,
-            'message' => "Message created and job dispatched.",
-        ]);
+          return response()->json([
+              'success' => true,
+              'message' => "Message created and job dispatched.",
+          ]);
+      }
+      return $ticketObj->id;
     }
 
     /**

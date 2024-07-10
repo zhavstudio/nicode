@@ -18,6 +18,7 @@ export default function Contents() {
         <>
             <Routes>
                     <Route path="" >
+                        <Route path="/" element={<Ticket/>}/>
                         <Route path="ticket" element={<Ticket/>}/>
                         <Route path="chat/:id" element={<TicketChat/>}/>
                         <Route path="financial" element={<AllTransactions/>}/>

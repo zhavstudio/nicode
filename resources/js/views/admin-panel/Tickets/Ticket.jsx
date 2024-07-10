@@ -97,8 +97,7 @@ export default function Ticket() {
     return (
         <Grid dir="rtl" container position="absolute" height="auto" sx={{
             width: '100%', backgroundColor: theme.palette.Primary[20], borderRadius: "20px",
-            '@media (min-width: 900px)': {width: '78%',}
-            ,
+            '@media (min-width: 900px)': {width: '85%',},'@media (min-width: 1600px)': {width: '91%',}
         }} marginTop={{xs: 11, md: "100px"}} ml={{xs:0,md:"50px"}}>
             <Grid item xs={12} p={1} >
                 <TicketTab/>

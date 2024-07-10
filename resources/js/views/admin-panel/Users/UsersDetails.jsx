@@ -7,6 +7,7 @@ import UsersDetailsTab from "./UsersDetailsTab";
 import {useQuery} from "react-query";
 import {route} from "./../helpers";
 import axios from './../../../axiosConfig';
+import CircularProgress from "@mui/material/CircularProgress";
 
 
 
@@ -78,16 +79,25 @@ export default function UsersDetails() {
 
 if (userDetails.isLoading){
     return (
-        <div>loading</div>
-    )
+        <div
+            style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+            }}
+        >
+            <CircularProgress />
+        </div>
+    );
 }
     return (
-        <Grid dir="rtl" container position="absolute" height="auto" sx={{
+        <Grid dir="rtl" container position="absolute" height="-webkit-fill-available" sx={{
             width: '100%', backgroundColor: theme.palette.Primary[20], borderRadius: "20px",
-            '@media (min-width: 900px)': {width: '78%',}
+            '@media (min-width: 900px)': {width: '85%',},'@media (min-width: 1600px)': {width: '91%',}
             ,
         }} marginTop={{xs: 9, md: "100px"}} ml={{xs:0,md:"50px"}}>
-            <Grid item xs={12} md={4}  p={3} pl={0}>
+            <Grid item xs={12} md={4} p={3} pl={0}>
 
                 <Typography fontWeight={900}>اطلاعات حساب کاربری</Typography>
                 <Box display="flex" flexDirection="row" gap="53px" mt={2} position="relative" >
@@ -200,7 +210,7 @@ if (userDetails.isLoading){
                     </Box>
                 </Box>
             </Grid>
-            <Grid item display={{xs: "none",md:"block"}} md={8}  p={3}>
+            <Grid item display={{xs: "none",md:"block"}} md={8} p={3} >
                 <UsersDetailsTab tickets={userDetails.data.data.user_tickets} transactions={userDetails.data.data.user_transactions
                 }/>
             </Grid>

@@ -195,9 +195,9 @@ export default function Ticket() {
 
 
     return (
-        <Box position="absolute" display="flex" justifyContent="center" alignItems="center" height="92vh" sx={{
+        <Box position="absolute" display="flex" alignItems="flex-start" height="92vh" sx={{
             width: '100%',
-            '@media (min-width: 900px)': {width: '84%',}
+            '@media (min-width: 900px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
             ,
         }} marginTop={{xs: 9, md: 7}}>
             <Snackbar
@@ -218,13 +218,11 @@ export default function Ticket() {
                     {message}
                 </Alert>
             </Snackbar>
-            <Grid item width="100%" p={{xs: 2, md: 7}}>
+            <Grid item width="100%"  p={{xs: 2, md: 7}}>
                 <Paper sx={{width: '100%', overflow: 'hidden', borderRadius: "20px", bgcolor: "#F4F4F4", boxShadow: 3}}>
                     <Box display="flex" justifyContent="space-between">
                         {isXsScreen && (
                             <Button
-                                to={"/panel/chat"}
-                                component={RouterLink}
                                 variant="contained"
                                 sx={{
                                     width: "10%",
@@ -233,6 +231,7 @@ export default function Ticket() {
                                     margin: 2,
                                     bgcolor: theme.palette.secondary.main
                                 }}
+                                onClick={handleOpen}
                             >
                                 افزودن
                             </Button>
@@ -292,6 +291,8 @@ export default function Ticket() {
                                     required
                                     {...register("message")}
                                     id="outlined-required"
+                                    multiline
+                                    rows={4}
                                     sx={{
                                         marginBottom: 2,
                                         width: "100%",
@@ -300,10 +301,20 @@ export default function Ticket() {
                                                 border: 'none',
                                             },
                                             mt: 2,
-                                            pl: 5,
-                                            backgroundColor: theme.palette.Primary[20], borderRadius: '20px',
-                                            boxShadow: {xs: 3, md: 0}, height: "257px",
-
+                                            pl: 2,
+                                            backgroundColor: theme.palette.Primary[20],
+                                            borderRadius: '20px',
+                                            boxShadow: {xs: 3, md: 0},
+                                            height: "257px",
+                                            alignItems: "flex-start", // Aligns content to the top
+                                            '& textarea': {
+                                                textAlign: "start", // Aligns text to the start
+                                                direction: "rtl", // Use "rtl" for right-to-left languages, "ltr" for left-to-right
+                                            },
+                                        },
+                                        '& .MuiInputBase-input': {
+                                            verticalAlign: "top", // Aligns text to the top
+                                            paddingTop: "14px", // Adds some top padding
                                         },
                                     }}
                                 />

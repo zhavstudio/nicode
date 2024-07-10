@@ -1,6 +1,6 @@
 {
-    "name": "Your App Name",
-    "short_name": "App",
+    "name": "کارگزار من",
+    "short_name": "کارگزار من",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
