@@ -22,7 +22,10 @@ class MessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "text"     =>    ["min:1","string","required"],
+            "text"     =>    ["nullable"],
+            "audio"    =>    ["min:1"],
+            "type"     =>    ["string"],
+            "file"     =>    ["min:1"]
         ];
     }
 }

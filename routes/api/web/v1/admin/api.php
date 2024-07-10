@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\TransactionController;
 use App\Http\Controllers\Api\Admin\UserController;
 
 use App\Http\Controllers\Api\Admin\MessageController;
 use App\Http\Controllers\Api\TicketController;
+use App\Http\Controllers\TempController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,6 +28,8 @@ Route::name("api.web.v1.admin.")->group(function () {
 
     Route::get('/unassigned-tickets', [TicketController::class, 'unassignedTickets'])
         ->name('unassigned');
+    Route::put('/close-ticket/{ticket}', [TicketController::class, 'update'])
+        ->name('close');
 
     Route::get('/messages/{ticket}', [MessageController::class, 'messages'])
         ->name('messages');
@@ -34,4 +38,10 @@ Route::name("api.web.v1.admin.")->group(function () {
         ->name('message');
 
     Route::get('user-details/{id}',[UserController::class,'details'])->name('details');
+
+    Route::get('transaction-list', [TransactionController::class, 'index'])->name('transaction-list');
+
+    Route::apiResource("temporary-file", TempController::class)->only("store");
+
+
 });

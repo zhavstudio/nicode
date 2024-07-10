@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 Route::name("api.public.")->group(function () {
 
     Route::get('/hi', function () {
-        return dd();
+        \App\Events\MessageEvent::dispatch('processed', 'prosper');
     });
 
 

@@ -13,7 +13,7 @@ import UserTickets from "@/views/admin-panel/Users/UserTickets.jsx";
 
 
 
-export default function UsersDetailsTab({tickets}){
+export default function UsersDetailsTab({tickets,transactions}){
     const [value, setValue] = React.useState('1');
 
     const handleChange = (event, newValue) => {
@@ -34,7 +34,7 @@ export default function UsersDetailsTab({tickets}){
                         </TabList>
                     </Box>
                     <TabPanel value="1" ><UserTickets tickets={tickets}/></TabPanel>
-                    <TabPanel value="2" ><Transactions/></TabPanel>
+                    <TabPanel value="2" ><Transactions transactions={transactions}/></TabPanel>
                 </TabContext>
             </Box>
         </Box>

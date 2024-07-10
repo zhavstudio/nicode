@@ -67,9 +67,10 @@ class TicketController
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTicketRequest $request, Ticket $ticket)
+    public function update( Ticket $ticket)
     {
-        //
+        $ticket->update(["status"  => 4]);
+        return 1;
     }
 
     /**

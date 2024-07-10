@@ -15,7 +15,7 @@ class TransactionController
      */
     public function index()
     {
-        return new WalletResource(auth()->user()->wallet->first());
+        return new WalletResource(auth()->user()->wallet()->first());
     }
 
     /**

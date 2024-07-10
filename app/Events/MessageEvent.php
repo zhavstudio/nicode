@@ -7,6 +7,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -29,11 +30,18 @@ class MessageEvent implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        $ticketId = $this->message['ticket_id'];
+        try {
+            $ticketId = $this->message['ticket_id'];
+            $channelName = "messages." . $ticketId;
 
-        return [
-            new PrivateChannel("messages.".$ticketId),
-        ];
+            return [new PrivateChannel($channelName)];
+
+
+        } catch (\Exception $e) {
+            info('MessageEvent broadcast failed: ' . $e->getMessage());
+            info($e->getTraceAsString());
+            throw $e;
+        }
     }
 
 }

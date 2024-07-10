@@ -11,15 +11,14 @@ import {alpha, Box, Button, Grid, InputAdornment, InputBase, useMediaQuery} from
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from '@mui/icons-material/Search';
 import theme from "./../../Custom";
-import { Link as RouterLink } from 'react-router-dom';
+import {Link as RouterLink} from 'react-router-dom';
 import {useQuery} from "react-query";
 import {route} from './helpers'
 import axios from './../../axiosConfig';
 
 
-
 const columns = [
-    { id: 'status', label: 'وضعیت', minWidth: 170 ,align: 'center',},
+    {id: 'status', label: 'وضعیت', minWidth: 170, align: 'center',},
     {
         id: 'density',
         label: 'از طرف',
@@ -41,32 +40,31 @@ const columns = [
         align: 'right',
         format: (value) => value.toLocaleString('en-US'),
     },
-    { id: 'title', label: 'موضوع', minWidth: 100 ,align: 'right',},
-    { id: 'id', label: 'شماره تراکنش', minWidth: 170 ,align: 'right',},
+    {id: 'title', label: 'موضوع', minWidth: 100, align: 'right',},
+    {id: 'id', label: 'شماره تراکنش', minWidth: 170, align: 'right',},
 ];
 
-function createData(id, title, population, size,status) {
-    const density = population / size;
-    return { id, title, population, size, density,status };
+function createData(id, title, population, size, density, status) {
+    return {id, title, population, size, density, status};
 }
 
-const rows = [
-    createData('#1234', 'محمد محمدي', 1324171354, 3287263,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('#1234', 'محمد محمدي', 1403500365, 9596961,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('#1234', 'محمد محمدي', 60483973, 301340,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('#1234', 'محمد محمدي', 327167434, 9833520,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('#1234', 'محمد محمدي', 37602103, 9984670,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('#1234', 'محمد محمدي', 25475400, 7692024,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('#1234', 'محمد محمدي', 83019200, 357578,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('#1234', 'محمد محمدي', 4857000, 70273,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('#1234', 'محمد محمدي', 126577691, 1972550,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('#1234', 'محمد محمدي', 126317000, 377973,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('#1234', 'محمد محمدي', 67022000, 640679,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('##1234', 'محمد محمدي', 67545757, 242495,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('#1234', 'محمد محمدي', 146793744, 17098246,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('#1234', 'محمد محمدي', 200962417, 923768,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-    createData('#1234', 'محمد محمدي', 210147125, 8515767,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
-];
+// const rows = [
+//     createData('#1234', 'محمد محمدي', 1324171354, 3287263,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('#1234', 'محمد محمدي', 1403500365, 9596961,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('#1234', 'محمد محمدي', 60483973, 301340,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('#1234', 'محمد محمدي', 327167434, 9833520,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('#1234', 'محمد محمدي', 37602103, 9984670,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('#1234', 'محمد محمدي', 25475400, 7692024,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('#1234', 'محمد محمدي', 83019200, 357578,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('#1234', 'محمد محمدي', 4857000, 70273,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('#1234', 'محمد محمدي', 126577691, 1972550,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('#1234', 'محمد محمدي', 126317000, 377973,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('#1234', 'محمد محمدي', 67022000, 640679,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('##1234', 'محمد محمدي', 67545757, 242495,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('#1234', 'محمد محمدي', 146793744, 17098246,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('#1234', 'محمد محمدي', 200962417, 923768,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+//     createData('#1234', 'محمد محمدي', 210147125, 8515767,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
+// ];
 export default function AllTransactions() {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -80,50 +78,75 @@ export default function AllTransactions() {
         setPage(0);
     };
 
-    const Ticket = useQuery("Ticket", async () => {
-        const { data } = await axios.get(
-            route("api.web.v1.admin.ticket.index")
+    const Transactions = useQuery("Transactions", async () => {
+        const {data} = await axios.get(
+            route("api.web.v1.admin.transaction-list")
         );
-        Ticket.data = data.data;
-        return Ticket;
+        Transactions.data = data.data;
+        return Transactions;
     });
 
-    // const rows = [];
-    //
-    // if (Ticket?.data?.data) {
-    //     rows.push(...Ticket.data.data.map((item, index) =>
-    //         createData(item.id, item.title, item.created_at, item.updated_at,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>{item.status}</Button>),
-    //     ));
-    // }
+    const backgroundColors = (Status) => {
+        let backgroundColor = "";
+        if (Status === "در انتظار") backgroundColor = alpha('#001949', 0.3);
+        else if (Status === "موفق") backgroundColor = alpha('#0BF04B', 0.3);
+        else if (Status === "ناموفق") backgroundColor = alpha('#B80B0B', 0.3);
+        else backgroundColor = "white";
+        return backgroundColor;
+    };
+
+    const colors = (Status) => {
+        let Color = "";
+        if (Status === "در انتظار") Color = "black";
+        else if (Status === "موفق") Color = '#23833E';
+        else if (Status === "ناموفق") Color = "red"
+        else Color = "black";
+        return Color;
+    };
+
+    const rows = [];
+
+    if (Transactions?.data?.data) {
+        rows.push(...Transactions.data.data.map((item, index) =>
+            createData(item.id, "افزایش اعتبار", item.created_at, item.amount, item.user,
+                <Button variant="contained"
+                        sx={{
+                            borderRadius: "20px",
+                            bgcolor:backgroundColors(item.status),
+                            color: colors(item.status)
+                        }}>{item.status}</Button>),
+        ));
+    }
 
     return (
-        <Box position="absolute"  display="flex" justifyContent="center" alignItems="center" height="92vh"   sx={{
+        <Box position="absolute" display="flex" justifyContent="center" alignItems="center" height="92vh" sx={{
             width: '100%',
             '@media (min-width: 900px)': {width: '84%',}
-            ,}} marginTop={{xs:9,md:7}}>
-            <Grid item width="100%" p={{xs:2,md:7}}>
-                <Paper sx={{ width: '100%', overflow: 'hidden' ,borderRadius:"20px",bgcolor:"#F4F4F4",boxShadow:3}}>
+            ,
+        }} marginTop={{xs: 9, md: 7}}>
+            <Grid item width="100%" p={{xs: 2, md: 7}}>
+                <Paper sx={{width: '100%', overflow: 'hidden', borderRadius: "20px", bgcolor: "#F4F4F4", boxShadow: 3}}>
                     <Box display="flex" justifyContent="end">
                         <InputBase
-                            sx={{ ml: 1 ,bgcolor:'#FFFFFF',borderRadius:"20px",margin:2,px:2}}
+                            sx={{ml: 1, bgcolor: '#FFFFFF', borderRadius: "20px", margin: 2, px: 2}}
                             placeholder="جستجو ..."
-                            inputProps={{ 'aria-label': 'search google maps' ,dir:"rtl"}}
+                            inputProps={{'aria-label': 'search google maps', dir: "rtl"}}
                             startAdornment={
                                 <InputAdornment position="start">
-                                    <SearchIcon />
+                                    <SearchIcon/>
                                 </InputAdornment>
                             }
                         />
                     </Box>
-                    <TableContainer sx={{ maxHeight: 440 }}>
-                        <Table >
+                    <TableContainer sx={{maxHeight: 440}}>
+                        <Table>
                             <TableHead>
                                 <TableRow>
                                     {columns.map((column) => (
                                         <TableCell
                                             key={column.id}
                                             align={column.align}
-                                            style={{ minWidth: column.minWidth }}
+                                            style={{minWidth: column.minWidth}}
                                         >
                                             {column.label}
                                         </TableCell>
@@ -138,7 +161,8 @@ export default function AllTransactions() {
                                                 {columns.map((column) => {
                                                     const value = row[column.id];
                                                     return (
-                                                        <TableCell key={column.id} align={column.align} component={RouterLink} to={`/panel/chat/${row.id}`}>
+                                                        <TableCell key={column.id} align={column.align}
+                                                                   component={RouterLink} to={`/panel/chat/${row.id}`}>
                                                             {column.format && typeof value === 'number'
                                                                 ? column.format(value)
                                                                 : value}

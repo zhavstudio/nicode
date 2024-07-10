@@ -6,7 +6,7 @@ const instance = axios.create({
     baseURL: import.meta.env.VITE_APP_URL,
     withCredentials: true,
     headers: {
-        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+        'Token': localStorage.getItem('token'),
         'Accept':'application/json',
         'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
@@ -17,7 +17,7 @@ const instance = axios.create({
 instance.interceptors.request.use(config => {
     const token = localStorage.getItem('token');
     if (token) {
-        config.headers['Authorization'] = 'Bearer ' + token;
+        config.headers['Token'] = token;
     }
     return config;
 }, error => {

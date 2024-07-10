@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -120,7 +120,7 @@ return [
 
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
-        'store' => env('APP_MAINTENANCE_STORE', 'database'),
+        'store'  => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
     /*
@@ -144,6 +144,21 @@ return [
     | database based of the current date and time
     */
 
-    'EXPIRATION_HOUR_VERIFICATION_CODE' => env('EXPIRATION_HOUR_VERIFICATION_CODE', 3)
+    'EXPIRATION_HOUR_VERIFICATION_CODE' => env('EXPIRATION_HOUR_VERIFICATION_CODE', 3),
+
+    /*
+   |--------------------------------------------------------------------------
+   | Rahyab SMS
+   |--------------------------------------------------------------------------
+   */
+
+    'RAHYAB' => [
+        'RAHYAB_USERNAME'       => env('RAHYAB_USERNAME', null),
+        'RAHYAB_USERNAME_TOKEN' => env('RAHYAB_USERNAME_TOKEN', null),
+        'RAHYAB_PASSWORD'       => env('RAHYAB_PASSWORD', null),
+        'RAHYAB_COMPANY'        => env('RAHYAB_COMPANY', null),
+        'RAHYAB_NUMBER'         => env('RAHYAB_NUMBER', null),
+        'RAHYAB_URL'            => env('RAHYAB_URL', null),
+    ]
 
 ];
