@@ -20,7 +20,7 @@ class UserDetailsResource extends JsonResource
             'last_name'         => $this->last_name,
             'phone_number'      => $this->phone_number,
             'email'             => $this->email,
-            'code_melli'        => $this->code_melli,
+            'code_meli'        => $this->code_meli,
             'gender'            => $this->gender->description,
             'status'            => $this->status->description,
             'tickets'           => count($this->ticket()->get()),

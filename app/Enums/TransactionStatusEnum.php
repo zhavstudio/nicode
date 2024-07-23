@@ -18,7 +18,7 @@ final class TransactionStatusEnum extends Enum
     public static function getDescription(mixed $value): string
     {
         return match ($value) {
-            self::pending => 'در انتظار',
+            self::pending => 'کنسل شده',
             self::success => 'موفق',
             self::failed => 'ناموفق',
             default => self::getKey($value),

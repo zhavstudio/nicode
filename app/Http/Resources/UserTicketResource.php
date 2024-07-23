@@ -24,7 +24,7 @@ class UserTicketResource extends JsonResource
             "rate"       => $this->rete,
             "feedback"   => $this->feedback,
             "created_at" => CalendarUtils::strftime('Y-m-d', strtotime($this->created_at)),
-            "updated_at" => CalendarUtils::strftime('Y-m-d', strtotime($this->updated_at)),
+            "updated_at" => CalendarUtils::strftime('Y-m-d,h:i:s', strtotime($this->updated_at)),
             "message"    => $this->messages
         ];
     }

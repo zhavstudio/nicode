@@ -26,6 +26,7 @@ import SentimentSatisfiedOutlinedIcon from "@mui/icons-material/SentimentSatisfi
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ClearIcon from '@mui/icons-material/Clear';
 import {useForm} from "react-hook-form";
+import FolderIcon from "@mui/icons-material/Folder";
 
 export default function TicketChat() {
 
@@ -229,7 +230,6 @@ export default function TicketChat() {
         for (const file of selectedFiles) {
             const formData = new FormData();
             formData.append('file', file);
-
             try {
                 const result = await TempFiles.mutateAsync(formData);
                 console.log('File uploaded successfully:', result);
@@ -248,7 +248,7 @@ export default function TicketChat() {
                 })
 
                 setValue("file", result)
-                setValue("type", "image")
+                setValue("type", file.type)
             } catch (error) {
                 console.error('Error uploading file:', error);
                 // Handle error (e.g., show an error message to the user)
@@ -276,6 +276,8 @@ export default function TicketChat() {
     const [ticketClose, SetTicketClose] = React.useState(false);
     const [file, setFile] = React.useState([]);
     const [preview, setPreview] = React.useState();
+    const imageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    const fileTypes = ["application/msword", "application/vnd.ms-excel", "application/vnd.ms-powerpoint","text/plain", "application/pdf"]
 
     const handleKeyDown = (event) => {
         console.log(event.key)
@@ -284,14 +286,30 @@ export default function TicketChat() {
             handleSubmit(onSubmit)();
         }
     };
+    const groupMessagesByDate = (messages) => {
+        const groups = {};
+        messages.forEach(message => {
+            const date = new Date(message.day).toLocaleDateString('fa-IR');
+            if (!groups[date]) {
+                groups[date] = [];
+            }
+            groups[date].push(message);
+        });
+        return groups;
+    };
+
+    const toPersianNumber = (number) => {
+        const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+        return number.toString().replace(/\d/g, x => persianDigits[x]);
+    };
 
     return (
         <Box position="absolute" onKeyDown={handleKeyDown} dir="rtl" height="92vh"
              sx={{
                  width: '100%',
-                 '@media (min-width: 900px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
+                 '@media (min-width: 900px)': {width: '91%',}, '@media (min-width: 1600px)': {width: '94.5%',}
                  ,
-             }} marginTop={{xs: 9, md: 7}} p={{xs: 1, md: 7}}>
+             }} marginTop={{xs: 9, md: 3}} p={{xs: 1, md: 7}}>
             <Snackbar
                 open={openSnack}
                 autoHideDuration={6000}
@@ -311,54 +329,109 @@ export default function TicketChat() {
                 </Alert>
             </Snackbar>
             <Grid item display="flex" p={{xs: 1, md: 3}} height="auto" flexDirection="column"
-                  boxShadow={3} borderRadius="20px" bgcolor="#F4F4F4" width="100%">
-                <Box display="flex" justifyContent="space-between" width="100%">
-                    <Typography sx={{height: "10%"}}>
-                        تيكت باز شده در{Messages?.data?.create}
-                    </Typography>
-                    <Button disabled={ticketClose} onClick={() => closeTicket.mutate()} variant="contained"
-                            sx={{width: "10%", pl: 2, borderRadius: "20px"}}>
-                        بستن تیکت
-                    </Button>
+                  borderRadius="20px" bgcolor="white" width="100%">
+                <Box display="flex" justifyContent="space-between" width="100%" mb={2}>
+                    {/*<Typography sx={{height: "10%"}}>*/}
+                    {/*    تيكت باز شده در{Messages?.data?.create}*/}
+                    {/*</Typography>*/}
+                    {/*<Button disabled={ticketClose} onClick={() => closeTicket.mutate()} variant="contained"*/}
+                    {/*        sx={{width: "10%", pl: 2, borderRadius: "20px"}}>*/}
+                    {/*    بستن تیکت*/}
+                    {/*</Button>*/}
                 </Box>
-                <Divider sx={{mt: "10px"}}/>
-                <Box display="flex" flexDirection="row" width="100%">
-                    <Box display="flex" flexDirection="column" width={{xs: "100%", md: "60%"}}>
+                {/*<Divider sx={{mt: "10px"}}/>*/}
+                <Box display="flex" flexDirection="row" width="100%" gap={2}>
+                    <Box display="flex" boxShadow={3} bgcolor={theme.palette.Primary[20]} borderRadius="20px"
+                         flexDirection="column" p={1} width={{xs: "100%", md: "60%"}}>
                         <Typography fontWeight="900">
                             {Messages?.data?.ticket_title}
                         </Typography>
-                        <Typography>آخرین آپدیت در{Messages?.data?.update}</Typography>
-                        <Box sx={{height: {xs: "640px", md: "363px"},'@media (min-width: 1600px)': {height: '700px',}, overflowY: 'auto'}}>
+                        {/*<Typography>آخرین آپدیت در{Messages?.data?.update}</Typography>*/}
+                        <Box sx={{
+                            height: {xs: "640px", md: "363px"},
+                            '@media (min-width: 1600px)': {height: '700px',},
+                            overflowY: 'auto'
+                        }}>
                             <Box width="100%" ref={chatBoxRef} display="flex" justifyContent="flex-end"
                                  flexDirection="column" p={1}>
-                                {chat?.messages?.map((item, index) => (
-                                    item.is_sender ?
-                                        (<Box display="flex" justifyContent="start" flexDirection="row" gap={1}
-                                              key={index}>
-                                            {/*<Avatar></Avatar>*/}
-                                            {item.type === 'audio' ? (
-                                                <Box display="flex" alignItems="center">
-                                                    <audio src={item.audio} controls/>
-                                                    <Typography fontSize={10} color="gray">{item.time}</Typography>
-                                                </Box>
-                                            ) : item.type === 'image' ?
-                                                <>
-                                                    <img src={item.url} style={{
-                                                        objectFit: "cover",
-                                                        width: "50%",
-                                                        height: "50%",
-                                                        aspectRatio: "1/1",
-                                                        borderRadius: 20,
-                                                        margin: "2px"
-                                                    }}
-                                                         onClick={() => handleImageClick(item.url)}
-                                                    />
-                                                    <Typography fontSize={10} color="gray">{item.time}</Typography>
-                                                </>
-                                                : (
+                                {Object.entries(groupMessagesByDate(chat?.messages || [])).map(([date, messages]) => (
+                                    <Box key={date}>
+                                        <Typography align="center" my={2} fontSize={12} color="gray">
+                                            {date}
+                                        </Typography>
+                                        {messages.map((item, index) => (
+                                            <Box
+                                                key={index}
+                                                display="flex"
+                                                justifyContent={item.is_sender ? "start" : "end"}
+                                                flexDirection="row"
+                                                gap={1}
+                                            >
+                                                {item.type === 'audio' ? (
+                                                    <Box display="flex" alignItems="center" mt={1}>
+                                                        <audio src={item.audio} controls/>
+                                                        <Typography fontSize={10} color="gray">{toPersianNumber(item.time)}</Typography>
+                                                    </Box>
+                                                ) : imageTypes.includes(item.type) ? (
                                                     <>
+                                                        {!item.is_sender && <Typography fontSize={10}
+                                                                                        color="gray">{toPersianNumber(item.time)}</Typography>}
+                                                        <img
+                                                            src={item.url}
+                                                            style={{
+                                                                objectFit: "cover",
+                                                                width: "50%",
+                                                                height: "50%",
+                                                                aspectRatio: "1/1",
+                                                                borderRadius: 20,
+                                                                margin: "2px"
+                                                            }}
+                                                            onClick={() => handleImageClick(item.url)}
+                                                        />
+                                                        {item.is_sender && <Typography fontSize={10}
+                                                                                       color="gray">{toPersianNumber(item.time)}</Typography>}
+                                                    </>
+                                                ) : fileTypes.includes(item.type) ? (
+                                                    <>
+                                                        {!item.is_sender && <Typography mt={2.5} fontSize={10}
+                                                                                        color="gray">{toPersianNumber(item.time)}</Typography>}
+                                                    <a
+                                                        href={`${window.location.origin}${item.url}`}
+                                                        style={{
+                                                            textDecoration: 'none',
+                                                            color: 'inherit',
+                                                            display: 'block',
+                                                            maxWidth: '50%'
+                                                        }}
+                                                    >
                                                         <Typography
-                                                            bgcolor={theme.palette.Primary[20]}
+                                                            bgcolor={theme.palette.Primary[30]}
+                                                            borderRadius="20px"
+                                                            width="100%"
+                                                            display="flex"
+                                                            justifyContent="center"
+                                                            alignItems="center"
+                                                            gap={1}
+                                                            p={1}
+                                                            mt={1}
+                                                            style={{
+                                                                wordBreak: 'break-word',
+                                                                cursor: 'pointer'
+                                                            }}
+                                                        >
+                                                            {item.type}
+                                                            <FolderIcon/>
+                                                        </Typography>
+                                                    </a>
+                                                        {item.is_sender && <Typography mt={2.5} fontSize={10}
+                                                                                        color="gray">{toPersianNumber(item.time)}</Typography>}
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        {!item.is_sender && <Typography mt={2.5} fontSize={10}
+                                                                                        color="gray">{toPersianNumber(item.time)}</Typography>}
+                                                        <Typography
+                                                            bgcolor={item.is_sender ? theme.palette.Primary[30] : "white"}
                                                             borderRadius="20px"
                                                             maxWidth="50%"
                                                             p={1}
@@ -369,50 +442,13 @@ export default function TicketChat() {
                                                         >
                                                             {item.text}
                                                         </Typography>
-                                                        <Typography mt={2.5} fontSize={10} color="gray">{item.time}</Typography>
+                                                        {item.is_sender && <Typography mt={2.5} fontSize={10}
+                                                                                       color="gray">{toPersianNumber(item.time)}</Typography>}
                                                     </>
                                                 )}
-                                        </Box>) :
-                                        (<Box display="flex" justifyContent="end" flexDirection="row" gap={1}
-                                              key={index}>
-                                            {/*<Avatar></Avatar>*/}
-                                            {item.type === 'audio' ? (
-                                                <Box display="flex" alignItems="center">
-                                                    <Typography fontSize={10} color="gray">{item.time}</Typography>
-                                                    <audio src={item.audio} controls/>
-                                                </Box>
-                                            ) : item.type === 'image' ?
-                                                <>
-                                                    <Typography fontSize={10} color="gray">{item.time}</Typography>
-                                                    <img src={item.url} style={{
-                                                    objectFit: "cover",
-                                                    width: "50%",
-                                                    height: "50%",
-                                                    aspectRatio: "1/1",
-                                                    borderRadius: 20,
-                                                    margin: "2px"
-                                                }}
-                                                     onClick={() => handleImageClick(item.url)}
-                                                />
-                                                </>
-                                                : (
-                                                    <>
-                                                        <Typography mt={2.5} fontSize={10} color="gray">{item.time}</Typography>
-                                                        <Typography
-                                                        bgcolor={theme.palette.Primary[20]}
-                                                        borderRadius="20px"
-                                                        maxWidth="50%"
-                                                        p={1}
-                                                        mt={1}
-                                                        style={{
-                                                            wordBreak: 'break-word',
-                                                        }}
-                                                    >
-                                                        {item.text}
-                                                    </Typography>
-                                                    </>
-                                                )}
-                                        </Box>)
+                                            </Box>
+                                        ))}
+                                    </Box>
                                 ))}
                             </Box>
                             <Box width="70%" bgcolor={alpha('#B80B0B', 0.3)} height="100px" borderRadius="20px"
@@ -437,7 +473,7 @@ export default function TicketChat() {
                                     },
                                     mt: 2,
                                     pl: 5,
-                                    backgroundColor: theme.palette.Primary[20], borderRadius: '20px',
+                                    backgroundColor: theme.palette.Primary[30], borderRadius: '20px',
                                     boxShadow: {xs: 3, md: 0},
                                     width: {xs: "100%", md: "97%"}
                                 },
@@ -493,7 +529,8 @@ export default function TicketChat() {
                                             </MenuItem>
                                         </Menu>
                                         <Box height="100%" display="flex" alignItems="center">
-                                            <input accept="image/*" id="icon-button-file" type="file"
+                                            <input accept="application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint,
+                                                text/plain, application/pdf, image/*" id="icon-button-file" type="file"
                                                    style={{display: "none"}} onChange={handleChange}/>
                                             <label htmlFor="icon-button-file">
                                                 <IconButton color="primary" component="span" disabled={ticketClose}>
@@ -506,13 +543,19 @@ export default function TicketChat() {
                             }}
                         ></TextField>
                     </Box>
-                    <Box width="30%" display={{xs: "none", md: "flex"}} alignItems="start" flexDirection='column' p={1}>
+                    <Box width="38%" boxShadow={3} bgcolor={theme.palette.Primary[20]} borderRadius="20px"
+                         display={{xs: "none", md: "flex"}} alignItems="start" flexDirection='column' p={1}>
                         <Typography fontWeight="900" mt={2}>جزییات</Typography>
                         <Divider sx={{mt: "10px"}}/>
                         <Typography mt={2} fontWeight="500">فایل های پیوست</Typography>
-                        <Box display="flex" gap={2} flexDirection="column" width="463px" sx={{height: {xs: "300px", md: "363px"},'@media (min-width: 1600px)': {height: '700px',}, overflowY: 'auto'}}>
+                        <Box display="flex" gap={2} flexDirection="column" width="463px" sx={{
+                            height: {xs: "300px", md: "363px"},
+                            '@media (min-width: 1600px)': {height: '700px',},
+                            overflowY: 'auto'
+                        }}>
                             {file?.map((item, index) =>
-                                <Box display="flex" flexDirection="row" width="100%" height="40%" alignItems="center" gap={2}>
+                                <Box display="flex" flexDirection="row" width="100%" height="40%" alignItems="center"
+                                     gap={2}>
                                     <img style={{
                                         objectFit: "cover",
                                         width: "50%",
@@ -541,17 +584,23 @@ export default function TicketChat() {
                                     top: '50%',
                                     left: '50%',
                                     transform: 'translate(-50%, -50%)',
-                                    maxWidth: '90vw',
+                                    width: {xs: "70vw", md: '30vw'}, // Reduced from 40vw to 30vw
                                     maxHeight: '90vh',
+                                    // backgroundColor: "#F4F4F4",
+                                    borderRadius: "20px",
+                                    display: "flex",
+                                    flexDirection: "column", // Changed to column for better layout
+                                    alignItems: "center", // Center items horizontally
+                                    padding: "20px", // Added padding for better spacing
                                 }}
                             >
                                 <img
                                     src={selectedImage}
                                     alt="Full screen preview"
                                     style={{
+                                        objectFit: 'contain',
                                         width: '100%',
                                         height: '100%',
-                                        objectFit: 'contain',
                                     }}
                                 />
                             </Box>
@@ -568,7 +617,7 @@ export default function TicketChat() {
                                     top: '50%',
                                     left: '50%',
                                     transform: 'translate(-50%, -50%)',
-                                    width: {xs:"70vw",md:'30vw'}, // Reduced from 40vw to 30vw
+                                    width: {xs: "70vw", md: '30vw'}, // Reduced from 40vw to 30vw
                                     maxHeight: '90vh',
                                     backgroundColor: "#F4F4F4",
                                     borderRadius: "20px",
@@ -599,7 +648,7 @@ export default function TicketChat() {
                                                 padding: "12px", // Increased padding for a larger button
                                             }}
                                 >
-                                    <SendIcon sx={{ fontSize: "1.5rem" }} /> {/* Increased icon size */}
+                                    <SendIcon sx={{fontSize: "1.5rem"}}/> {/* Increased icon size */}
                                 </IconButton>
                             </Box>
                         </Modal>

@@ -20,7 +20,7 @@ class UserResource extends JsonResource
             'id'           => $this->id,
             'name'         => $this->name,
             'created_at'   => CalendarUtils::strftime('Y-m-d', strtotime($this->created_at)),
-            'updated_at'   => CalendarUtils::strftime('Y-m-d', strtotime($this->updated_at)),
+            'updated_at'   => CalendarUtils::strftime('Y-m-d,h:i:s', strtotime($this->updated_at)),
             'phone_number' => $this->phone_number,
             'code_meli'    => $this->code_meli,
             'status'       => $this->status->description,

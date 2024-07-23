@@ -3,7 +3,7 @@ import {Box, Button, Divider, Grid, List, ListItem, ListItemText, Snackbar, Text
 import theme from "./../../Custom"
 import logo from "./../../assets/logo.svg"
 import {MuiOtpInput} from 'mui-one-time-password-input'
-import {Link} from "react-router-dom";
+import {Link as RouterLink, Link} from "react-router-dom";
 import {useMutation} from "react-query";
 import axios from './../../axiosConfig';
 import {route} from './helpers'
@@ -147,7 +147,7 @@ export default function Otp() {
                             fontFamily: 'Dana',
                             fontWeight: '500',
                             color: theme.palette.secondary.main
-                        }}>{phone}</span>را وارد نمایید
+                        }}>{phone} </span>را وارد نمایید
                         </Typography>
                     </ListItem>
                 </List>
@@ -155,6 +155,7 @@ export default function Otp() {
                              onComplete={handleOtp} onChange={handleChange}/>
                 <LoadingButton
                     color="secondary"
+                    component={RouterLink} to="/panel"
                     sx={{
                         width: '50%',
                         color: theme.palette.common.white,
@@ -166,7 +167,7 @@ export default function Otp() {
                     loadingPosition="start"
                     variant="contained"
                 >
-                    <Link to="/panel">ورود</Link>
+                    ورود
                 </LoadingButton>
             </Grid>
         </Grid>
