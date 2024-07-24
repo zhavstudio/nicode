@@ -34,12 +34,11 @@ class SendSMS
         $response = $this->sendRequest('post', 'api/auth/gettoken', $data, false);
 
         // Assuming the token is directly in the response for simplicity
-        return $response['token'] ?? '';
+        return $response ?? '';
     }
 
     protected function getCachedToken(): string
     {
-        info("get token");
         if (Cache::has('api_token')) {
             return Cache::get('api_token');
         }
@@ -50,9 +49,8 @@ class SendSMS
         return $newToken;
     }
 
-    protected function sendRequest(string $method, string $endpoint, array $data, bool $isAuth = true): array
+    protected function sendRequest(string $method, string $endpoint, array $data, bool $isAuth = true)
     {
-        info('SMS send start');
 
         $headers = ['Accept' => 'application/json'];
 
@@ -62,14 +60,18 @@ class SendSMS
 
         $response = Http::withHeaders($headers)->$method($this->baseUri . $endpoint, $data);
 
-        info('SMS send end');
+        if ($response->status() === 401 && $isAuth) {
+            // If unauthorized, get a new token and retry
+            Cache::forget('api_token');
+            $headers['Authorization'] = 'Bearer ' . $this->getCachedToken();
+            $response = Http::withHeaders($headers)->$method($this->baseUri . $endpoint, $data);
+        }
 
         return $response->json();
     }
 
     public function sendSingleSMS(string $message, string $destinationNumber, string $messageId): array
     {
-        info('Sending single SMS');
 
         $data = [
             'userName'           => $this->username,

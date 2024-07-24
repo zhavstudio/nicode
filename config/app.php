@@ -159,6 +159,18 @@ return [
         'RAHYAB_COMPANY'        => env('RAHYAB_COMPANY', null),
         'RAHYAB_NUMBER'         => env('RAHYAB_NUMBER', null),
         'RAHYAB_URL'            => env('RAHYAB_URL', null),
+    ],
+
+    /*
+   |--------------------------------------------------------------------------
+   | Rahyab SMS
+   |--------------------------------------------------------------------------
+   */
+
+    'FARAZ' => [
+        'FARAZ_PATTERN_LOGIN_SUCCESS' => env('FARAZ_PATTERN_LOGIN_SUCCESS', null),
+        'SMS_SENDER_NUMBER'           => env('SMS_SENDER_NUMBER', null),
+        'FARAZ_SMS_PANEL_API'         => env('FARAZ_SMS_PANEL_API', null),
     ]
 
 ];
