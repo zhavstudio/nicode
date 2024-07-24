@@ -167,7 +167,10 @@ export default function UserTickets({tickets}){
     const rows = [];
 
     if (tickets) {
-        rows.push(...tickets.map((item, index) =>
+        const filtered = tickets.filter((item,index)=>{
+            return item.message.length > 0
+        })
+        rows.push(...filtered.map((item, index) =>
             createData(item.id, item.title, item.created_at, item.updated_at,item.user, <Button variant="contained" sx={{
                 borderRadius: "20px",
                 bgcolor:backgroundColors(item.status) ,

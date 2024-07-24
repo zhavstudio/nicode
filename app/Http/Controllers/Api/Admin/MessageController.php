@@ -130,6 +130,7 @@ class MessageController
         }
 
         SendMessage::dispatch($ticketRecord,auth()->id());
+        Ticket::where('id', $ticket->id)->touch();
 
         return response()->json([
             'success' => true,

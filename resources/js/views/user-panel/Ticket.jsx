@@ -87,6 +87,13 @@ export default function Ticket() {
     const [openSnack, setOpenSnack] = React.useState(false);
     const [status, setStatus] = React.useState("success");
     const [message, setMessage] = React.useState("This is a success message!");
+    const [searchTerm, setSearchTerm] = React.useState('');
+    const [order, setOrder] = React.useState('desc');
+    const [orderBy, setOrderBy] = React.useState('size');
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
+        setPage(0); // Reset to first page when searching
+    };
 
     const style = {
         position: 'absolute',
@@ -109,6 +116,11 @@ export default function Ticket() {
     const handleClose = () => {
         setOpen(false)
     };
+    const handleRequestSort = (property) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
 
     const isXsScreen = useMediaQuery('(max-width:599px)');
     const isMdOrHigher = useMediaQuery('(min-width:900px)');
@@ -128,6 +140,7 @@ export default function Ticket() {
             route("api.web.v1.user.userTicket")
         );
         Ticket.data = data.data;
+        handleRequestSort('size')
         return Ticket;
     });
 
@@ -165,10 +178,10 @@ export default function Ticket() {
 
     const backgroundColors = (Status) => {
         let backgroundColor = "";
-        if (Status === "در انتظار") backgroundColor = alpha('#001949', 0.3);
+        if (Status === "در انتظار") backgroundColor = alpha('#6e2478', 0.3);
         else if (Status === "جدید") backgroundColor = alpha('#0BF04B', 0.3);
         else if (Status === "بسته") backgroundColor = alpha('#B80B0B', 0.3);
-        else backgroundColor = "white";
+        else backgroundColor = backgroundColor = alpha('#08330d', 0.6);
         return backgroundColor;
     };
     const colors = (Status) => {
@@ -176,7 +189,7 @@ export default function Ticket() {
         if (Status === "در انتظار") Color = "black";
         else if (Status === "جدید") Color = '#23833E';
         else if (Status === "بسته") Color = "red"
-        else Color = "black";
+        else Color = "white";
         return Color;
     };
 
@@ -191,13 +204,44 @@ export default function Ticket() {
             }}>{item.status}</Button>),
         ));
     }
+    const filteredRows = rows.filter((row) =>
+        Object.values(row).some((value) =>
+            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    );
+    const compareFunction = (a, b) => {
+        console.log(a)
+        if (orderBy === 'size') {
+            const dateA = parseJalaliDateTime(a[orderBy]);
+            const dateB = parseJalaliDateTime(b[orderBy]);
+            return order === 'desc' ? dateA - dateB : dateB - dateA;
+        }
+        if (b[orderBy] < a[orderBy]) {
+            return order === 'desc' ? -1 : 1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return order === 'desc' ? 1 : -1;
+        }
+        return 0;
+    };
+    const parseJalaliDateTime = (dateTimeStr) => {
+        const [datePart, timePart] = dateTimeStr.split(',');
+        const [year, month, day] = datePart.split('-').map(Number);
+        const [hour, minute, second] = timePart.split(':').map(Number);
 
+        // Create a Date object (this will be in Gregorian calendar)
+        // Note: month is 0-indexed in JavaScript Date
+        return new Date(year, month - 1, day, hour, minute, second);
+    };
 
+    const sortedRows = React.useMemo(() => {
+        return [...filteredRows].sort(compareFunction);
+    }, [filteredRows, order, orderBy]);
 
     return (
         <Box position="absolute" display="flex" alignItems="flex-start" height="92vh" sx={{
             width: '100%',
-            '@media (min-width: 900px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
+            '@media (min-width: 900px)': {width: '85%',},'@media (min-width: 1200px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
             ,
         }} marginTop={{xs: 9, md: 7}}>
             <Snackbar
@@ -330,6 +374,8 @@ export default function Ticket() {
                             sx={{ml: 1, bgcolor: '#FFFFFF', borderRadius: "20px", margin: 2, px: 2}}
                             placeholder="جستجو ..."
                             inputProps={{'aria-label': 'search google maps', dir: "rtl"}}
+                            value={searchTerm}
+                            onChange={handleSearchChange}
                             startAdornment={
                                 <InputAdornment position="start">
                                     <SearchIcon/>
@@ -353,7 +399,7 @@ export default function Ticket() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                {sortedRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((row) => {
                                         return (
                                             <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
@@ -377,7 +423,7 @@ export default function Ticket() {
                     <TablePagination
                         rowsPerPageOptions={[10, 25, 100]}
                         component="div"
-                        count={rows.length}
+                        count={filteredRows.length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}

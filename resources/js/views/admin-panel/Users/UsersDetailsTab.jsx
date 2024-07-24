@@ -21,16 +21,16 @@ export default function UsersDetailsTab({tickets,transactions}){
     };
 
     return(
-        <Box position="absolute" sx={{
-            width: '100%',
-            '@media (min-width: 900px)': {width: '84%',}
+        <Box position="absolute" display="flex" justifyContent="center" borderRadius="20px" sx={{
+            width: '100%',bgcolor:theme.palette.Primary[20],
+            '@media (min-width: 900px)': {width: '62%',}
             ,}}>
-            <Box sx={{ width: '75%', typography: 'body1' }}>
+            <Box sx={{ width: '90%', typography: 'body1' }}>
                 <TabContext value={value}>
                     <Box sx={{display:"flex",justifyContent:"center", borderBottom: 2, borderColor: theme.palette.Primary[30] }}>
                         <TabList onChange={handleChange} aria-label="lab API tabs example">
                             <Tab label="تیکت های ارسال شده" value="1" />
-                            <Tab label="تراکنشات" value="2" />
+                            <Tab label="تراکنش ها" value="2" />
                         </TabList>
                     </Box>
                     <TabPanel value="1" ><UserTickets tickets={tickets}/></TabPanel>

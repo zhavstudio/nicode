@@ -24,6 +24,8 @@ class Message extends Model
      * @var string
      */
     protected $table = 'messages';
+    protected $touches = ['ticket'];
+
 
     /**
      * The primary key associated with the table.

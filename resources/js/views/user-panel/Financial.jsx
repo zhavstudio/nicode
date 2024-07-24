@@ -28,6 +28,7 @@ import {useMutation, useQuery} from "react-query";
 import axios from "@/axiosConfig.js";
 import {route} from "@/views/user-panel/helpers.js";
 import { useForm } from "react-hook-form";
+import SearchIcon from "@mui/icons-material/Search.js";
 
 
 const columns = [
@@ -60,8 +61,14 @@ export default function Financial() {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const [open, setOpen] = React.useState(false);
+    const [searchTerm, setSearchTerm] = React.useState('');
+
     const formatNumber = (value) => {
         return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
+        setPage(0); // Reset to first page when searching
     };
 
     const handleChange = (event) => {
@@ -200,30 +207,36 @@ export default function Financial() {
     };
     const statusRender = (status) => {
         switch (status) {
-            case 'در انتظار':
-                return 'alert'
+            case 'کنسل شده':
+                return alpha('#fc7703', 0.3)
             case 'موفق':
-                return 'active'
+                return alpha('#0BF04B', 0.3)
             case 'ناموفق':
-                return 'danger'
+                return alpha('#B80B0B', 0.3)
         }
 
     }
     const rows = [];
     if (!transactions.isLoading) {
         rows.push(...transactions.data.data.transactions.map((item, index) =>
-            createData(item.id,item.amount, item.created_at, <Typography style={{color: "white", paddingLeft:10, paddingRight:10, paddingTop:5, paddingBottom:5}}  variant="contained"
+            createData(item.id,item.amount, item.created_at, <Typography style={{color: "black", paddingLeft:10, paddingRight:10, paddingTop:5, paddingBottom:5}}  variant="contained"
                 sx={{borderRadius: "20px", bgcolor: statusRender(item.status)}}>{item.status}</Typography>),
         ));
     }
 
+    const filteredRows = rows.filter((row) =>
+        Object.values(row).some((value) =>
+            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    );
+
     return (
         <Box display="flex" alignItems="flex-start" height="92vh" sx={{
             width: '100%',
-            '@media (min-width: 900px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
+            '@media (min-width: 900px)': {width: '85%',},'@media (min-width: 1200px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
             ,
         }} marginTop={{xs: 9, md: 14}}>
-            <Grid container spacing={2} sx={{display: "flex", justifyContent: "center"}}>
+            <Grid container mt={{xs:"20px",md:0}} spacing={2} sx={{display: "flex", justifyContent: "center"}}>
                 <Grid item md={6} sx={{mb:5,display: isXsScreen ? "none" : "flex", justifyContent: "flex-end"}}>
                     <Box width="551px" height="266px" display="flex" flexDirection="column" alignItems="center"
                         justifyContent="center"
@@ -291,6 +304,20 @@ export default function Financial() {
                         bgcolor: "#F4F4F4",
                         boxShadow: 3,
                     }}>
+                        <Box display="flex" justifyContent="end">
+                            <InputBase
+                                sx={{ml: 1, bgcolor: '#FFFFFF', borderRadius: "20px", margin: 2, px: 2}}
+                                placeholder="جستجو ..."
+                                inputProps={{'aria-label': 'search google maps', dir: "rtl"}}
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                                startAdornment={
+                                    <InputAdornment position="start">
+                                        <SearchIcon/>
+                                    </InputAdornment>
+                                }
+                            />
+                        </Box>
                         <TableContainer sx={{maxHeight: 440}}>
                             <Table>
                                 <TableHead>
@@ -304,8 +331,7 @@ export default function Financial() {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {rows
-                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                         .map((row) => {
                                             return (
                                                 <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
@@ -323,9 +349,15 @@ export default function Financial() {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <TablePagination rowsPerPageOptions={[10, 25, 100]} component="div" count={rows.length}
-                            rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}/>
+                        <TablePagination
+                            rowsPerPageOptions={[10, 25, 100]}
+                            component="div"
+                            count={filteredRows.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
                     </Paper>
                 </Grid>
             </Grid>

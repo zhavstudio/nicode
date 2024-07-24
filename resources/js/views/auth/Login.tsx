@@ -2,7 +2,7 @@ import * as React from "react";
 import {Box, Button, Divider, Grid, List, ListItem, ListItemText, TextField, Typography, useTheme} from "@mui/material";
 import theme from "./../../Custom"
 import logo from "./../../assets/logo.svg"
-import {Link, Navigate} from "react-router-dom";
+import {Link as RouterLink, Link, Navigate} from "react-router-dom";
 import {useState} from "react";
 import axios from './../../axiosConfig';
 import {useMutation, useQuery} from "react-query";
@@ -115,6 +115,7 @@ export default function Login() {
                 <Button
                     onClick={handleSubmit}
                     variant="contained"
+                    component={RouterLink} to="/otp"
                     sx={{
                         width: '50%',
                         color: theme.palette.common.white,
@@ -123,10 +124,7 @@ export default function Login() {
                     }}
                     disabled={isButtonDisabled}
                 >
-                    <Link to={'/otp'} style={{ textDecoration: 'none', width: '50%' }}>
-
                     ادامه
-                    </Link>
                 </Button>
             </Grid>
         </Grid>

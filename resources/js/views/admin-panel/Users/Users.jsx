@@ -64,7 +64,7 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width:"346px",
+    width:"500px",
     bgcolor: 'background.paper',
     borderRadius: "20px",
     boxShadow: 24,
@@ -83,6 +83,20 @@ export default function Users() {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [open, setOpen] = React.useState(false);
+    const [searchTerm, setSearchTerm] = React.useState('');
+    const [order, setOrder] = React.useState('desc');
+    const [orderBy, setOrderBy] = React.useState('size');
+
+    const handleRequestSort = (property) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
+        setPage(0); // Reset to first page when searching
+    };
+
 
     //modal handling
     const handleOpen = () => setOpen(true);
@@ -109,6 +123,7 @@ export default function Users() {
             route("api.web.v1.admin.user.index")
         );
         users.data = data.data;
+        handleRequestSort("size")
         return users;
     });
     const addUser = useMutation(
@@ -144,6 +159,11 @@ export default function Users() {
             createData(item.id, item.name, item.created_at, item.updated_at,item.phone_number,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>{item.status}</Button>),
         ));
     }
+    const filteredRows = rows.filter((row) =>
+        Object.values(row).some((value) =>
+            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    );
 
     //react hook forms config
     const {
@@ -167,11 +187,40 @@ export default function Users() {
         {label: "زن",value:"1"},
     ]
 
+    const compareFunction = (a, b) => {
+        console.log(a)
+        if (orderBy === 'size') {
+            const dateA = parseJalaliDateTime(a[orderBy]);
+            const dateB = parseJalaliDateTime(b[orderBy]);
+            return order === 'desc' ? dateA - dateB : dateB - dateA;
+        }
+        if (b[orderBy] < a[orderBy]) {
+            return order === 'desc' ? -1 : 1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return order === 'desc' ? 1 : -1;
+        }
+        return 0;
+    };
+    const parseJalaliDateTime = (dateTimeStr) => {
+        const [datePart, timePart] = dateTimeStr.split(',');
+        const [year, month, day] = datePart.split('-').map(Number);
+        const [hour, minute, second] = timePart.split(':').map(Number);
+
+        // Create a Date object (this will be in Gregorian calendar)
+        // Note: month is 0-indexed in JavaScript Date
+        return new Date(year, month - 1, day, hour, minute, second);
+    };
+
+    const sortedRows = React.useMemo(() => {
+        return [...filteredRows].sort(compareFunction);
+    }, [filteredRows, order, orderBy]);
+
 
     return (
         <Box position="absolute" display="flex" justifyContent="center" alignItems="center" height="92vh"   sx={{
             width: '100%',
-            '@media (min-width: 900px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
+            '@media (min-width: 900px)': {width: '88%',},'@media (min-width: 1200px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
             ,}} marginTop={{xs:9,md:6}}>
             <Snackbar
                 open={openSnack}
@@ -196,12 +245,14 @@ export default function Users() {
                         {isXsScreen && (
                             <Box display="flex" flexDirection="column">
                                 <InputBase
-                                    sx={{ ml: 1 ,bgcolor:'#FFFFFF',borderRadius:"20px",margin:2,px:2}}
+                                    sx={{ml: 1, bgcolor: '#FFFFFF', borderRadius: "20px", margin: 2, px: 2}}
                                     placeholder="جستجو ..."
-                                    inputProps={{ 'aria-label': 'search google maps' ,dir:"rtl"}}
+                                    inputProps={{'aria-label': 'search google maps', dir: "rtl"}}
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
                                     startAdornment={
                                         <InputAdornment position="start">
-                                            <SearchIcon />
+                                            <SearchIcon/>
                                         </InputAdornment>
                                     }
                                 />
@@ -278,7 +329,7 @@ export default function Users() {
                                                     <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
                                                     <Typography>کد ملی</Typography>
                                                 </Box>
-                                                <TextField {...register("code_melli",{ required: "این فیلد ضروری است" })}
+                                                <TextField {...register("code_meli",{ required: "این فیلد ضروری است" })}
                                                     sx={{'& .MuiOutlinedInput-root': {'& fieldset': {border: 'none',},backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1},}}>
                                                 </TextField>
                                                 {/*<Box display="flex" flexDirection="row">*/}
@@ -338,7 +389,7 @@ export default function Users() {
                                                 <TextField {...register("first_name",{ required: "این فیلد ضروری است" })}
                                                            sx={{'& .MuiOutlinedInput-root': {'& fieldset': {border: 'none',},backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1},}}>
                                                 </TextField>
-                                                {errors.first_name?.type === 'required' && <p style={{color:'red'}} role="alert">{errors.name.message}</p>}
+                                                {errors.first_name?.type === 'required' && <p style={{color:'red'}} role="alert">{errors.first_name.message}</p>}
                                                 <Box display="flex" flexDirection="row">
                                                     <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
                                                     <Typography>ایمیل</Typography>
@@ -381,10 +432,10 @@ export default function Users() {
                                                     <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>
                                                     <Typography>کد ملی</Typography>
                                                 </Box>
-                                                <TextField {...register("code_melli",{ required: "این فیلد ضروری است" })}
+                                                <TextField {...register("code_meli",{ required: "این فیلد ضروری است" })}
                                                            sx={{'& .MuiOutlinedInput-root': {'& fieldset': {border: 'none',},backgroundColor: theme.palette.Primary[20], borderRadius: '20px',mt:1},}}>
                                                 </TextField>
-                                                {errors.code_melli?.type === 'required' && <p style={{color:'red'}} role="alert">{errors.code_melli.message}</p>}
+                                                {errors.code_meli?.type === 'required' && <p style={{color:'red'}} role="alert">{errors.code_meli.message}</p>}
                                                 {/*<Box display="flex" flexDirection="row">*/}
                                                 {/*    <FiberManualRecordIcon sx={{color:theme.palette.Secondary.main}}/>*/}
                                                 {/*    <Typography>وضعیت</Typography>*/}
@@ -408,12 +459,14 @@ export default function Users() {
                                     </Box>
                                 </Modal>
                                 <InputBase
-                                    sx={{ ml: 1 ,bgcolor:'#FFFFFF',borderRadius:"20px",margin:2,px:2}}
+                                    sx={{ml: 1, bgcolor: '#FFFFFF', borderRadius: "20px", margin: 2, px: 2}}
                                     placeholder="جستجو ..."
-                                    inputProps={{ 'aria-label': 'search google maps' ,dir:"rtl"}}
+                                    inputProps={{'aria-label': 'search google maps', dir: "rtl"}}
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
                                     startAdornment={
                                         <InputAdornment position="start">
-                                            <SearchIcon />
+                                            <SearchIcon/>
                                         </InputAdornment>
                                     }
                                 />
@@ -435,7 +488,7 @@ export default function Users() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                {sortedRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((row) => {
                                         return (
                                             <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
@@ -458,7 +511,7 @@ export default function Users() {
                     <TablePagination
                         rowsPerPageOptions={[10, 25, 100]}
                         component="div"
-                        count={rows.length}
+                        count={filteredRows.length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}

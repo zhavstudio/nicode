@@ -44,8 +44,8 @@ const columns = [
     {id: 'id', label: 'شماره تراکنش', minWidth: 170, align: 'right',},
 ];
 
-function createData(id, title, population, size, density, status) {
-    return {id, title, population, size, density, status};
+function createData(id, title, population, size, density, status,user_id) {
+    return {id, title, population, size, density, status,user_id};
 }
 
 // const rows = [
@@ -68,7 +68,20 @@ function createData(id, title, population, size, density, status) {
 export default function AllTransactions() {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [searchTerm, setSearchTerm] = React.useState('');
+    const [order, setOrder] = React.useState('desc');
+    const [orderBy, setOrderBy] = React.useState('population');
 
+    const handleRequestSort = (property) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
+        setPage(0); // Reset to first page when searching
+    };
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -83,12 +96,13 @@ export default function AllTransactions() {
             route("api.web.v1.admin.transaction-list")
         );
         Transactions.data = data.data;
+        handleRequestSort('population')
         return Transactions;
     });
 
     const backgroundColors = (Status) => {
         let backgroundColor = "";
-        if (Status === "در انتظار") backgroundColor = alpha('#001949', 0.3);
+        if (Status === "کنسل شده") backgroundColor = alpha('#fc7703', 0.3);
         else if (Status === "موفق") backgroundColor = alpha('#0BF04B', 0.3);
         else if (Status === "ناموفق") backgroundColor = alpha('#B80B0B', 0.3);
         else backgroundColor = "white";
@@ -97,7 +111,7 @@ export default function AllTransactions() {
 
     const colors = (Status) => {
         let Color = "";
-        if (Status === "در انتظار") Color = "black";
+        if (Status === "کنسل شده") Color = "black";
         else if (Status === "موفق") Color = '#23833E';
         else if (Status === "ناموفق") Color = "red"
         else Color = "black";
@@ -114,9 +128,43 @@ export default function AllTransactions() {
                             borderRadius: "20px",
                             bgcolor:backgroundColors(item.status),
                             color: colors(item.status)
-                        }}>{item.status}</Button>),
+                        }}>{item.status}</Button>,item.user_id)
         ));
     }
+
+    const filteredRows = rows.filter((row) =>
+        Object.values(row).some((value) =>
+            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    );
+    const compareFunction = (a, b) => {
+        console.log(a)
+        if (orderBy === 'population') {
+            const dateA = parseJalaliDateTime(a[orderBy]);
+            const dateB = parseJalaliDateTime(b[orderBy]);
+            return order === 'desc' ? dateA - dateB : dateB - dateA;
+        }
+        if (b[orderBy] < a[orderBy]) {
+            return order === 'desc' ? -1 : 1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return order === 'desc' ? 1 : -1;
+        }
+        return 0;
+    };
+    const parseJalaliDateTime = (dateTimeStr) => {
+        const [datePart, timePart] = dateTimeStr.split(',');
+        const [year, month, day] = datePart.split('-').map(Number);
+        const [hour, minute, second] = timePart.split(':').map(Number);
+
+        // Create a Date object (this will be in Gregorian calendar)
+        // Note: month is 0-indexed in JavaScript Date
+        return new Date(year, month - 1, day, hour, minute, second);
+    };
+
+    const sortedRows = React.useMemo(() => {
+        return [...filteredRows].sort(compareFunction);
+    }, [filteredRows, order, orderBy]);
 
     return (
         <Box position="absolute" height="92vh" sx={{
@@ -131,6 +179,8 @@ export default function AllTransactions() {
                             sx={{ml: 1, bgcolor: '#FFFFFF', borderRadius: "20px", margin: 2, px: 2}}
                             placeholder="جستجو ..."
                             inputProps={{'aria-label': 'search google maps', dir: "rtl"}}
+                            value={searchTerm}
+                            onChange={handleSearchChange}
                             startAdornment={
                                 <InputAdornment position="start">
                                     <SearchIcon/>
@@ -154,15 +204,16 @@ export default function AllTransactions() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                {sortedRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((row) => {
+                                        console.log(row)
                                         return (
                                             <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
                                                 {columns.map((column) => {
                                                     const value = row[column.id];
                                                     return (
                                                         <TableCell key={column.id} align={column.align}
-                                                                   component={RouterLink} to={`/panel/chat/${row.id}`}>
+                                                                   component={RouterLink} to={`/panel/users/${row.user_id}`}>
                                                             {column.format && typeof value === 'number'
                                                                 ? column.format(value)
                                                                 : value}
@@ -178,7 +229,7 @@ export default function AllTransactions() {
                     <TablePagination
                         rowsPerPageOptions={[10, 25, 100]}
                         component="div"
-                        count={rows.length}
+                        count={filteredRows.length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}

@@ -29,7 +29,7 @@ class UserRequest extends FormRequest
             'first_name'   => ['string'],
             'last_name'    => ['string'],
             'gender'       => ['string'],
-            'code_meli'    => ['string', 'max:10', 'min:10'],
+            'code_meli'    => ['max:10', 'min:10'],
             'email'        => ['string', 'email']
         ];
     }

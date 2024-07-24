@@ -125,11 +125,12 @@ export default function Panel(props) {
                 position="fixed"
                 sx={{
                     '@media (min-width: 1600px)': {width: '90%',},
-                    width: {sm: '83%'},
-                    mr: {sm: `${drawerWidth + 48}px`},
+                    width: {sm: '100%',md:'79%',lg:"82%"},
+                    mr: {md: `${drawerWidth + 48}px`},
                     borderRadius: '24px',
                     backgroundColor: theme.palette.secondary.main,
-                    mt: '20px'
+                    mt: '20px',
+                    '@media (min-width: 900px)': {zIndex: (theme) => theme.zIndex.drawer + 1,}
                 }}
             >
                 <Toolbar sx={{ justifyContent: 'flex-end' }}>
@@ -142,12 +143,29 @@ export default function Panel(props) {
                         aria-label="open drawer"
                         edge="start"
                         onClick={handleDrawerToggle}
-                        sx={{ml: 2, display: {sm: 'none'}}}
+                        sx={{ml: 2, display: {md: 'none'}}}
                     >
                         <MenuIcon/>
                     </IconButton>
                 </Toolbar>
             </AppBar>
+            <Box
+                sx={{
+                    position: 'fixed',
+                    top: 0,
+                    // right: {sm: drawerWidth},
+                    // left: 0,
+                    height: '64px', // 84px (AppBar height + top margin) + 20px extra
+                    backgroundColor: 'white',
+                    '@media (min-width: 900px)': {zIndex: (theme) => theme.zIndex.drawer},
+                    // '@media (min-width: 1600px)': {
+                        width: '100%',
+                        right: 'auto',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                    // },
+                }}
+            />
             <Box
                 component="nav"
                 sx={{width: {sm: drawerWidth}, flexShrink: {sm: 0}}}
@@ -163,7 +181,7 @@ export default function Panel(props) {
                         keepMounted: true,
                     }}
                     sx={{
-                        display: {xs: 'block', sm: 'none'},
+                        display: {xs: 'block', sm: 'block',md:"none"},
                         '& .MuiDrawer-paper': {
                             boxSizing: 'border-box',
                             width: drawerWidth,
@@ -177,7 +195,7 @@ export default function Panel(props) {
                     anchor="right" // This will make the drawer appear on the right side
                     variant="permanent"
                     sx={{
-                        display: {xs: 'none', sm: 'block'},
+                        display: {xs: 'none', sm: 'none',md:"block"},
                         '& .MuiDrawer-paper': {
                             boxSizing: 'border-box',
                             width: drawerWidth,
@@ -196,7 +214,7 @@ export default function Panel(props) {
                     width: {sm: `calc(100% - ${drawerWidth}px)`},
                     maxHeight: 'calc(100vh - 64px)', // Set the maximum height
                     overflowY: 'auto', // Ad
-            }}
+                }}
             >
 
             </Box>
