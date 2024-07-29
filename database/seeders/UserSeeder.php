@@ -31,6 +31,18 @@ class UserSeeder extends Seeder
 
             ],
             [
+
+                'first_name' => "علی",
+                'last_name' => "مجرد",
+                'phone_number'  => "09138936589",
+                'email' => "alimojarad@gmail.com",
+                'email_verified_at' => Carbon::Now(),
+                "password" => bcrypt("landatripadmin"),
+                'gender' => 0,
+                'role'   => "admin"
+
+            ],
+            [
                 'first_name' => "Iman",
                 'last_name' => "Nasr Esfahani",
                 'phone_number'  => "09131287005",

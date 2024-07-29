@@ -18,11 +18,11 @@ class BaseListener
      */
     public function FARAZAMAN_SMS_PANEL(string $patternCode, string $resipientNumber, array $patternValues)
     {
-        $client = new \IPPanel\Client(env('FARAZ_SMS_PANEL_API',null));
+        $client = new \IPPanel\Client(config('app.FARAZ.FARAZ_SMS_PANEL_API',null));
 
         $messageId = $client->sendPattern(
             $patternCode,    // pattern code
-            env("SMS_SENDER_NUMBER", null),      // originator
+            config("app.FARAZ.SMS_SENDER_NUMBER", null),      // originator
             $resipientNumber,  // recipient
             $patternValues  // pattern values
         );
