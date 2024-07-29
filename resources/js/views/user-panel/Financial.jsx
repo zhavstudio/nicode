@@ -248,11 +248,12 @@ export default function Financial() {
     );
 
     return (
-        <Box display="flex" alignItems="flex-start" height="92vh" sx={{
+        <Box position="absolute" display="flex" height="92vh"   sx={{
             width: '100%',
-            '@media (min-width: 900px)': {width: '85%',},'@media (min-width: 1200px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
-            ,
-        }} marginTop={{xs: 9, md: 14}}>
+            '@media (min-width: 900px)': {width: '85%',},
+            '@media (min-width: 1200px)': {width: '90%',}
+            ,'@media (min-width: 1500px)': {width: '91%',}
+            ,'@media (min-width: 1900px)': {width: '93%',}            ,}} marginTop={{xs:9,md:14}}>
             <Grid container mt={{xs:"20px",md:0}} spacing={2} sx={{display: "flex", justifyContent: "center"}}>
                 <Grid item md={6} sx={{mb:5,display: isXsScreen ? "none" : "flex", justifyContent: "flex-end"}}>
                     <Box width="551px" height="266px" display="flex" flexDirection="column" alignItems="center"

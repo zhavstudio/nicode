@@ -95,9 +95,12 @@ class TicketController
     /**
      * Display a listing of the resource.
      */
-    public function unassignedTickets()
+    public function unassignedTickets(Ticket $ticket)
     {
-        return UserTicketResource::collection(Ticket::where("assigned_id","=",null)->get());
-    }
+        return UserTicketResource::collection(
+            Ticket::whereNull('assigned_id')
+                ->whereHas('messages')
+                ->get()
+        );    }
 
 }

@@ -50,7 +50,7 @@ function createData(id, title, population, size , density, status) {
 }
 
 
-export default function UnAssignedTicket() {
+export default function UnAssignedTicket({ tickets, setTickets }) {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [searchTerm, setSearchTerm] = React.useState('');
@@ -80,14 +80,7 @@ export default function UnAssignedTicket() {
         setPage(0);
     };
 
-    const Ticket = useQuery("Ticket", async () => {
-        const { data } = await axios.get(
-            route("api.web.v1.admin.unassigned")
-        );
-        Ticket.data = data.data;
-        handleRequestSort("size")
-        return Ticket;
-    });
+
 
     const backgroundColors = (Status) => {
         let backgroundColor = "";
@@ -106,20 +99,19 @@ export default function UnAssignedTicket() {
         return Color;
     };
 
-    const rows = [];
-
-    if (Ticket?.data?.data) {
-        const filtered = Ticket?.data?.data.filter((item,index)=>{
-            return item.message.length > 0
-        })
-        rows.push(...filtered.map((item, index) =>
-            createData(item.id, item.title, item.created_at, item.updated_at,item.user, <Button variant="contained" sx={{
-                borderRadius: "20px",
-                bgcolor:backgroundColors(item.status) ,
-                color: colors(item.status)
-            }}>{item.status}</Button>),
-        ));
-    }
+    const rows = React.useMemo(() => {
+        handleRequestSort("size")
+        return tickets.map((item) =>
+            createData(item.id, item.title, item.created_at, item.updated_at, item.user,
+                <Button variant="contained" sx={{
+                    borderRadius: "20px",
+                    bgcolor: backgroundColors(item.status),
+                    color: colors(item.status)
+                }}>{item.status}</Button>,
+                item.updated_at
+            )
+        );
+    }, [tickets]);
     const filteredRows = rows.filter((row) =>
         Object.values(row).some((value) =>
             value.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -154,6 +146,9 @@ export default function UnAssignedTicket() {
         return [...filteredRows].sort(compareFunction);
     }, [filteredRows, order, orderBy]);
 
+    if (rows === []){
+        return <p>loading</p>
+    }
     return (
         <Box dir="ltr">
         <Paper sx={{ width: '100%', overflow: 'hidden' ,borderRadius:"20px",bgcolor:"#F4F4F4",boxShadow:3}}>

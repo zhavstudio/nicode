@@ -10,6 +10,7 @@ use App\Models\Message;
 use App\Models\TemporaryFile;
 use App\Models\Ticket;
 use App\Models\TicketRecord;
+use App\Providers\FirebaseServiceProvider;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -136,4 +137,15 @@ class MessageController
             'message' => "Message created and job dispatched.",
         ]);
     }
+
+    public function sendNotification(FirebaseServiceProvider $firebaseService)
+    {
+        $token = 'user_fcm_token';
+        $title = 'Notification Title';
+        $body = 'Notification Body';
+        $data = ['key' => 'value']; // Optional
+
+        $firebaseService->sendNotification($token, $title, $body, $data);
+    }
+
 }

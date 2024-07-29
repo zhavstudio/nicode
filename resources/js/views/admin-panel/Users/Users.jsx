@@ -220,8 +220,10 @@ export default function Users() {
     return (
         <Box position="absolute" display="flex" justifyContent="center" alignItems="center" height="92vh"   sx={{
             width: '100%',
-            '@media (min-width: 900px)': {width: '88%',},'@media (min-width: 1200px)': {width: '91%',},'@media (min-width: 1600px)': {width: '94.5%',}
-            ,}} marginTop={{xs:9,md:6}}>
+            '@media (min-width: 900px)': {width: '87%',},
+            '@media (min-width: 1200px)': {width: '90%',}
+            ,'@media (min-width: 1500px)': {width: '91%',}
+            ,'@media (min-width: 1900px)': {width: '93%',}            ,}} marginTop={{xs:9,md:6}}>
             <Snackbar
                 open={openSnack}
                 autoHideDuration={6000}
