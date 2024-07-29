@@ -65,7 +65,7 @@ function createData(id, title, population, size, density, status, updated_at) {
 //     createData('#1234', 'محمد محمدي', 200962417, 923768,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
 //     createData('#1234', 'محمد محمدي', 210147125, 8515767,<Button variant="contained" sx={{borderRadius:"20px",bgcolor:alpha('#0BF04B', 0.3),color:"#23833E"}}>جدید</Button>),
 // ];
-export default function AssignedTicket() {
+export default function AssignedTicket({ tickets, setTickets }) {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [order, setOrder] = React.useState('desc');
@@ -94,14 +94,14 @@ export default function AssignedTicket() {
         setPage(0);
     };
 
-    const Ticket = useQuery("Ticket", async () => {
-        const {data} = await axios.get(
-            route("api.web.v1.admin.ticket.index")
-        );
-        Ticket.data = data.data;
-        handleRequestSort("size")
-        return Ticket;
-    });
+    // const Ticket = useQuery("Ticket", async () => {
+    //     const {data} = await axios.get(
+    //         route("api.web.v1.admin.ticket.index")
+    //     );
+    //     Ticket.data = data.data;
+    //     handleRequestSort("size")
+    //     return Ticket;
+    // });
 
     const backgroundColors = (Status) => {
         let backgroundColor = "";
@@ -120,20 +120,21 @@ export default function AssignedTicket() {
         else Color = "white";
         return Color;
     };
+    console.log(tickets)
 
-
-    const rows = [];
-
-    if (Ticket?.data?.data) {
-        rows.push(...Ticket.data.data.map((item, index) =>
-            createData(item.id, item.title, item.created_at, item.updated_at, item.user, <Button variant="contained"
-                                                                                                 sx={{
-                                                                                                     borderRadius: "20px",
-                                                                                                     bgcolor: backgroundColors(item.status),
-                                                                                                     color: colors(item.status)
-                                                                                                 }}>{item.status}</Button>, item.updated_at),
-        ));
-    }
+    const rows = React.useMemo(() => {
+        handleRequestSort("size")
+        return tickets.map((item) =>
+            createData(item.id, item.title, item.created_at, item.updated_at, item.user,
+                <Button variant="contained" sx={{
+                    borderRadius: "20px",
+                    bgcolor: backgroundColors(item.status),
+                    color: colors(item.status)
+                }}>{item.status}</Button>,
+                item.updated_at
+            )
+        );
+    }, [tickets]);
     const filteredRows = rows.filter((row) =>
         Object.values(row).some((value) =>
             value.toString().toLowerCase().includes(searchTerm.toLowerCase())

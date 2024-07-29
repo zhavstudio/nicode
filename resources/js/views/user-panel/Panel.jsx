@@ -124,8 +124,9 @@ export default function Panel(props) {
             <AppBar
                 position="fixed"
                 sx={{
-                    '@media (min-width: 1600px)': {width: '90%',},
-                    width: {sm: '100%',md:'79%',lg:"82%"},
+                    '@media (min-width: 1600px)': {width: '85%',},
+                    '@media (min-width: 1900px)': {width: '87%',},
+                    width: {sm: '100%',md:'80%',lg:"83%"},
                     mr: {md: `${drawerWidth + 48}px`},
                     borderRadius: '24px',
                     backgroundColor: theme.palette.secondary.main,
@@ -159,10 +160,10 @@ export default function Panel(props) {
                     backgroundColor: 'white',
                     '@media (min-width: 900px)': {zIndex: (theme) => theme.zIndex.drawer},
                     // '@media (min-width: 1600px)': {
-                        width: '100%',
-                        right: 'auto',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
+                    width: '100%',
+                    right: 'auto',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
                     // },
                 }}
             />
