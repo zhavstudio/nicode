@@ -141,6 +141,8 @@ export default function Ticket() {
         );
         Ticket.data = data.data;
         handleRequestSort('size')
+        setOrder('asc');
+        setOrderBy('size');
         return Ticket;
     });
 

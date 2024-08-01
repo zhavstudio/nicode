@@ -48,7 +48,7 @@ export default function TicketTab(){
             route("api.web.v1.admin.unassigned")
         );
         unassignedTicket.data = data.data;
-        // handleRequestSort("size")
+        setUnassignedTickets(data.data)
         return unassignedTicket;
     });
 

@@ -75,7 +75,6 @@ class MessageController
 
     public function messages(Ticket $ticket): array
     {
-
         $ticketTitle = $ticket->title;
         $update = $ticket->updated_at;
         $create = $ticket->created_at;
@@ -83,8 +82,15 @@ class MessageController
         $messages = MessagesResource::collection($ticket->messages()->get());
 
         $messagesWithImages = $messages->filter(function ($message) {
-            return $message->type === 'image';
+            $types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp',"application/msword", "application/vnd.ms-excel", "application/vnd.ms-powerpoint","text/plain", "application/pdf"];
+            return in_array($message->type,$types) ;
         })->values()->all();
+
+        // Get the penultimate message ID
+        $penultimateMessageId = null;
+        if (count($messages) >= 2) {
+            $penultimateMessageId = $messages[count($messages) - 2]['id'];
+        }
 
         return [
             'update'    => CalendarUtils::strftime('Y-m-d', strtotime($update)),
@@ -95,6 +101,7 @@ class MessageController
             'messages' => $messages,
             'status'   => $ticket->status,
             'image_messages' => $messagesWithImages,
+            'sync_id'  => $penultimateMessageId,  // New field for the penultimate message ID
         ];
     }
 
@@ -128,8 +135,14 @@ class MessageController
                 }
             }
         }
+        $messages = MessagesResource::collection($ticket->messages()->get());
+        $penultimateMessageId = null;
+        if (count($messages) >= 2) {
+            $penultimateMessageId = $messages[count($messages) - 2]['id'];
+        }
 
-        SendMessage::dispatch($ticketRecord,auth()->id());
+
+        SendMessage::dispatch($ticketRecord,$penultimateMessageId);
         Ticket::where('id', $ticket->id)->touch();
 
         return response()->json([
