@@ -91,11 +91,11 @@ export default function Financial() {
         setPage(0); // Reset to first page when searching
     };
 
-    function numberToWords(number) {
+    function numberToWords(value) {
         const ones = ['', 'یک', 'دو', 'سه', 'چهار', 'پنج', 'شش', 'هفت', 'هشت', 'نه'];
         const tens = ['', '', 'بیست', 'سی', 'چهل', 'پنجاه', 'شصت', 'هفتاد', 'هشتاد', 'نود'];
         const hundreds = ['', 'صد', 'دویست', 'سیصد', 'چهارصد', 'پانصد', 'ششصد', 'هفتصد', 'هشتصد', 'نهصد'];
-
+        let number = value?.replace(/,/g, '')
         function convertThreeDigits(num) {
             let word = '';
             const hundreds_digit = Math.floor(num / 100);
@@ -213,8 +213,6 @@ export default function Financial() {
         setPage(newPage);
     };
     const onSubmit = (data) => {
-        setValue('amount', data.amount.replace(/,/g, ''))
-
         postTransaction.mutate(data);
         reset();
     };
