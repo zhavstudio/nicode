@@ -172,7 +172,7 @@ export default function AssignedTicket({ tickets, setTickets }) {
     return (
         <Box dir="ltr">
             <Paper sx={{width: '100%', overflow: 'hidden', borderRadius: "20px", bgcolor: "#F4F4F4", boxShadow: 3}}>
-                <Box display="flex" justifyContent="space-between">
+                <Box display="flex" justifyContent="flex-end">
                     <InputBase
                         sx={{ml: 1, bgcolor: '#FFFFFF', borderRadius: "20px", margin: 2, px: 2}}
                         placeholder="جستجو ..."

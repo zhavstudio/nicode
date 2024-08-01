@@ -20,7 +20,7 @@ class SendMessage implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public Message $message)
+    public function __construct(public Message $message,public $sync_id)
     {
         //
     }
@@ -43,6 +43,7 @@ class SendMessage implements ShouldQueue
                 "audio" => $this->message->audio ? Storage::url("voice/".$this->message->audio) : null,
                 'type' => $this->message->type,
                 'url' => $image ? Storage::url("image/".$image->url) : null,
+                'sync_id' => $this->sync_id
             ]);
         } catch (\Exception $e) {
             \Laravel\Prompts\info('Failed to dispatch MessageEvent: ' . $e->getMessage());

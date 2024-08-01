@@ -40,6 +40,17 @@ export default function TicketChat() {
     const [message, setMessage] = React.useState("This is a success message!");
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const openE = Boolean(anchorEl);
+    const [tempMessages, setTempMessages] = useState([]);
+    const [emojiModalOpen, setEmojiModalOpen] = useState(false);
+
+    const openEmoji = () => {
+        setEmojiModalOpen(true);
+    };
+
+// Add this function to close the emoji modal
+    const closeEmojiModal = () => {
+        setEmojiModalOpen(false);
+    };
 
     //react hook forms config
     const {
@@ -49,13 +60,40 @@ export default function TicketChat() {
         reset,
         formState: {errors, isValid},
     } = useForm({mode: "onBlur"});
+    const getLatestId = () => {
+        if (chat?.messages?.length > 0) {
+            const latestIndex = chat?.messages?.length - 1;
+            const latestItem = chat?.messages[latestIndex];
+            return latestItem.id; // Assuming each item in the chat array has an 'id' property
+        }
+        return null; // Return null or some default value if the array is empty
+    };
+    const latestId = getLatestId();
+    console.log(latestId)
     const onSubmit = (data) => {
-        setPreview(null)
-        console.log(inputValue)
-        sendMessage.mutate(data, {
+        setPreview(null);
+        const tempId = Date.now();
+        const tempMessage = {
+            tempId: tempId, // Use a separate tempId
+            id: latestId, // The real id will come from the server
+            ...data,
+            is_sender: true,
+            time: new Date().toLocaleTimeString('fa-IR'),
+            day: new Date().toISOString(),
+        };
+        setTempMessages(prev => [...prev, tempMessage]);
+        setInputValue('');
+        // setChat(prev => ({
+        //     ...prev,
+        //     messages: Array.isArray(prev.messages) ? [...prev.messages, tempMessage] : [tempMessage]
+        // }));
+        // Save to local storage
+        const updatedTempMessages = [...tempMessages, tempMessage];
+        localStorage.setItem('tempMessages', JSON.stringify(updatedTempMessages));
+
+        sendMessage.mutate({...data, tempId: tempId}, {
             onSuccess: () => {
-                setInputValue('');
-                reset()
+                reset();
             }
         });
     };
@@ -71,9 +109,9 @@ export default function TicketChat() {
         setValue("text", newInputValue); // Update the form value
     }
 
-    const openEmoji = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
+    // const openEmoji = (event: React.MouseEvent<HTMLButtonElement>) => {
+    //     setAnchorEl(event.currentTarget);
+    // };
 
 
     //Scroll auto
@@ -94,9 +132,9 @@ export default function TicketChat() {
                 setOpenSnack(true);
                 setStatus("success");
                 setMessage("تیکت ارسال شد");
-                setTimeout(()=>{
+                // setTimeout(()=>{
                     scrollToBottom();
-                },3000)
+                // },3000)
             },
             onError: () => {
                 setOpenSnack(true);
@@ -165,31 +203,64 @@ export default function TicketChat() {
             },
         }
     )
-
     //WebSocket config
     const connectWebSocket = () => {
         window.Echo.private(`messages.${params.id}`)
             .listen('MessageEvent', (data) => {
-                console.log(data)
                 setChat(prev => {
-                    return {
-                        ...prev,
-                        messages: [...prev.messages, {
+                    const prevMessages = Array.isArray(prev.messages) ? prev.messages : [];
+                    // Find the index of the temporary message
+                    const tempIndex = prevMessages.findIndex(msg =>
+                        msg.tempId && msg.id === data.message.sync_id
+                    );
+
+                    if (tempIndex !== -1) {
+                        // If found, replace the temporary message
+                        const updatedMessages = [...prevMessages];
+                        updatedMessages[tempIndex] = {
                             ...data.message,
                             is_sender: data.message.user_id === prev.id
-                        }]
-                    };
+                        };
+                        return { ...prev, messages: updatedMessages };
+                    } else {
+                        // If not found, add the new message
+                        return {
+                            ...prev,
+                            messages: [...prevMessages, {
+                                ...data.message,
+                                is_sender: data.message.user_id === prev.id
+                            }]
+                        };
+                    }
                 });
-            })
+                // Remove from tempMessages
+                setTempMessages(prev => prev.filter(msg =>
+                    !(msg.tempId && msg.id === data.message.sync_id)
+                ));
 
+                // Update local storage
+                localStorage.setItem('tempMessages', JSON.stringify(
+                    JSON.parse(localStorage.getItem('tempMessages') || '[]')
+                        .filter(msg => !(msg.tempId && msg.id === data.message.sync_id))
+                ));
+                scrollToBottom();
+
+            });
     };
     useEffect(() => {
+        const storedTempMessages = JSON.parse(localStorage.getItem('tempMessages') || '[]');
+        console.log(storedTempMessages)
+        setTempMessages(storedTempMessages);
+        setChat(prev => ({
+            ...prev,
+            messages: Array.isArray(prev.messages) ? [...prev.messages, ...storedTempMessages] : storedTempMessages
+        }));
+
         connectWebSocket();
 
         return () => {
             window.Echo.leave("messages");
         }
-
     }, []);
 
     //Audio message config
@@ -234,17 +305,18 @@ export default function TicketChat() {
                 const result = await TempFiles.mutateAsync(formData);
                 console.log('File uploaded successfully:', result);
 
-                setFile(prevFiles => [
-                    ...prevFiles,
-                    {
-                        file: file,
-                        url: URL.createObjectURL(file),
-                        tempId: result.id // Assuming the server returns an id for the temporary file
-                    }
-                ]);
+                // setFile(prevFiles => [
+                //     ...prevFiles,
+                //     {
+                //         file: file,
+                //         url: URL.createObjectURL(file),
+                //         tempId: result.id // Assuming the server returns an id for the temporary file
+                //     }
+                // ]);
                 setPreview({
                     file: file,
                     url: URL.createObjectURL(file),
+                    type:file.type
                 })
 
                 setValue("file", result)
@@ -288,28 +360,34 @@ export default function TicketChat() {
     };
     const groupMessagesByDate = (messages) => {
         const groups = {};
-        messages.forEach(message => {
-            const date = new Date(message.day).toLocaleDateString('fa-IR');
-            if (!groups[date]) {
-                groups[date] = [];
-            }
-            groups[date].push(message);
-        });
+        if (Array.isArray(messages)) {
+            messages.forEach(message => {
+                if (message && message.day) {
+                    const date = new Date(message.day).toLocaleDateString('fa-IR');
+                    if (!groups[date]) {
+                        groups[date] = [];
+                    }
+                    groups[date].push(message);
+                }
+            });
+        }
         return groups;
     };
 
-    const toPersianNumber = (number) => {
+    const toPersianNumber = (time) => {
         const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-        return number.toString().replace(/\d/g, x => persianDigits[x]);
+        const [hours, minutes] = time.split(':');
+        return `${hours.replace(/\d/g, x => persianDigits[x])}:${minutes.replace(/\d/g, x => persianDigits[x])}`;
     };
-
     return (
         <Box position="absolute" onKeyDown={handleKeyDown} dir="rtl" height="92vh"
              sx={{
                  width: '100%',
-                 '@media (min-width: 900px)': {width: '91%',}, '@media (min-width: 1600px)': {width: '94.5%',}
-                 ,
-             }} marginTop={{xs: 9, md: 3}} p={{xs: 1, md: 7}}>
+                 '@media (min-width: 900px)': {width: '88%',},
+                 '@media (min-width: 1200px)': {width: '90%',}
+                 ,'@media (min-width: 1500px)': {width: '91.5%',}
+                 ,'@media (min-width: 1900px)': {width: '94%',}
+             }}  marginTop={{xs: 9, md: 3}} p={{xs: 1, md: 7}} >
             <Snackbar
                 open={openSnack}
                 autoHideDuration={6000}
@@ -334,10 +412,10 @@ export default function TicketChat() {
                     {/*<Typography sx={{height: "10%"}}>*/}
                     {/*    تيكت باز شده در{Messages?.data?.create}*/}
                     {/*</Typography>*/}
-                    {/*<Button disabled={ticketClose} onClick={() => closeTicket.mutate()} variant="contained"*/}
-                    {/*        sx={{width: "10%", pl: 2, borderRadius: "20px"}}>*/}
-                    {/*    بستن تیکت*/}
-                    {/*</Button>*/}
+                    <Button disabled={ticketClose} onClick={() => closeTicket.mutate()} variant="contained"
+                            sx={{width: "10%", pl: 2, borderRadius: "20px",mr:1}}>
+                        بستن تیکت
+                    </Button>
                 </Box>
                 {/*<Divider sx={{mt: "10px"}}/>*/}
                 <Box display="flex" flexDirection="row" width="100%" gap={2}>
@@ -354,7 +432,7 @@ export default function TicketChat() {
                         }}>
                             <Box width="100%" ref={chatBoxRef} display="flex" justifyContent="flex-end"
                                  flexDirection="column" p={1}>
-                                {Object.entries(groupMessagesByDate(chat?.messages || [])).map(([date, messages]) => (
+                                {Object.entries(groupMessagesByDate([...(chat?.messages || []), ...tempMessages])).map(([date, messages]) => (
                                     <Box key={date}>
                                         <Typography align="center" my={2} fontSize={12} color="gray">
                                             {date}
@@ -368,10 +446,15 @@ export default function TicketChat() {
                                                 gap={1}
                                             >
                                                 {item.type === 'audio' ? (
-                                                    <Box display="flex" alignItems="center" mt={1}>
-                                                        <audio src={item.audio} controls/>
-                                                        <Typography fontSize={10} color="gray">{toPersianNumber(item.time)}</Typography>
-                                                    </Box>
+                                                    <>
+                                                        {!item.is_sender && <Typography fontSize={10} mt={3}
+                                                                                        color="gray">{toPersianNumber(item.time)}</Typography>}
+                                                        <Box display="flex" width="50%" justifyContent={item.is_sender ? "flex-start" : "flex-end"} mt={1}>
+                                                            <audio src={item.audio} controls/>
+                                                        </Box>
+                                                        {item.is_sender && <Typography fontSize={10} mt={3}
+                                                                                       color="gray">{toPersianNumber(item.time)}</Typography>}
+                                                    </>
                                                 ) : imageTypes.includes(item.type) ? (
                                                     <>
                                                         {!item.is_sender && <Typography fontSize={10}
@@ -405,7 +488,7 @@ export default function TicketChat() {
                                                         }}
                                                     >
                                                         <Typography
-                                                            bgcolor={theme.palette.Primary[30]}
+                                                            bgcolor={item.is_sender ? "gray" : "white"}
                                                             borderRadius="20px"
                                                             width="100%"
                                                             display="flex"
@@ -554,9 +637,11 @@ export default function TicketChat() {
                             overflowY: 'auto'
                         }}>
                             {file?.map((item, index) =>
-                                <Box display="flex" flexDirection="row" width="100%" height="40%" alignItems="center"
+                                <Box display="flex"  flexDirection="row" width={{md:'50%',lg:"88%",xs:"100%"}} height="40%" alignItems="center"
                                      gap={2}>
-                                    <img style={{
+                                    {imageTypes.includes(item?.type) ?
+                                        <>
+                                        <img style={{
                                         objectFit: "cover",
                                         width: "50%",
                                         height: "100%",
@@ -569,6 +654,33 @@ export default function TicketChat() {
                                         <Typography> ارسال شده در</Typography>
                                         <Typography>{item.image_create}</Typography>
                                     </Box>
+                                        </>
+                                        :
+                                        <>
+                                        <Typography
+                                        bgcolor={theme.palette.Primary[30]}
+                                        borderRadius="20px"
+                                        width="100%"
+                                        display="flex"
+                                        justifyContent="center"
+                                        alignItems="center"
+                                        gap={1}
+                                        p={1}
+                                        mt={1}
+                                        style={{
+                                        wordBreak: 'break-word',
+                                        cursor: 'pointer'
+                                    }}
+                                        >
+                                    {item?.type}
+                                        <FolderIcon/>
+                                        </Typography>
+                                        <Box display="flex" flexDirection="column">
+                                        {/*<Typography> ارسال شده در</Typography>*/}
+                                        <Typography>{item.image_create}</Typography>
+                                        </Box>
+                                        </>
+                                    }
                                 </Box>
                             )}
                         </Box>
@@ -627,6 +739,7 @@ export default function TicketChat() {
                                     padding: "20px", // Added padding for better spacing
                                 }}
                             >
+                            {imageTypes.includes(preview?.type) ?
                                 <img
                                     src={preview?.url}
                                     alt="Full screen preview"
@@ -639,6 +752,27 @@ export default function TicketChat() {
                                         marginBottom: "10px" // Added margin to separate from the button
                                     }}
                                 />
+                            :
+                                <Typography
+                                    bgcolor={theme.palette.Primary[30]}
+                                    borderRadius="20px"
+                                    width="100%"
+                                    display="flex"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    gap={1}
+                                    p={1}
+                                    mt={1}
+                                    style={{
+                                        wordBreak: 'break-word',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    {preview?.type}
+                                    <FolderIcon/>
+                                </Typography>
+
+                            }
                                 <IconButton onClick={handleSubmit(onSubmit)}
                                             sx={{
                                                 backgroundColor: "#E0E0E0", // Added a background color
@@ -650,6 +784,34 @@ export default function TicketChat() {
                                 >
                                     <SendIcon sx={{fontSize: "1.5rem"}}/> {/* Increased icon size */}
                                 </IconButton>
+                            </Box>
+                        </Modal>
+                        <Modal
+                            open={emojiModalOpen}
+                            onClose={closeEmojiModal}
+                            aria-labelledby="emoji-modal"
+                            aria-describedby="emoji-picker-modal"
+                        >
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    bgcolor: 'background.paper',
+                                    boxShadow: 24,
+                                    p: 4,
+                                    borderRadius: 2,
+                                }}
+                            >
+                                <EmojiPicker
+                                    height={400}
+                                    width={350}
+                                    onEmojiClick={(emojiData, event) => {
+                                        onClickShowEmoji(emojiData, event);
+                                        // closeEmojiModal();
+                                    }}
+                                />
                             </Box>
                         </Modal>
                     </Box>

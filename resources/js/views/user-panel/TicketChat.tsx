@@ -30,7 +30,6 @@ import FolderIcon from '@mui/icons-material/Folder';
 
 export default function TicketChat() {
     const [chat, setChat] = React.useState([]);
-    const [age, setAge] = React.useState('');
     const [inputValue, setInputValue] = useState('');
     const params = useParams();
     const chatBoxRef = useRef(null);
@@ -39,6 +38,17 @@ export default function TicketChat() {
     const [message, setMessage] = React.useState("This is a success message!");
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const openE = Boolean(anchorEl);
+    const [tempMessages, setTempMessages] = useState([]);
+    const [emojiModalOpen, setEmojiModalOpen] = useState(false);
+
+    const openEmoji = () => {
+        setEmojiModalOpen(true);
+    };
+
+// Add this function to close the emoji modal
+    const closeEmojiModal = () => {
+        setEmojiModalOpen(false);
+    };
 
     //react hook forms config
     const {
@@ -48,12 +58,40 @@ export default function TicketChat() {
         reset,
         formState: {errors, isValid},
     } = useForm({mode: "onBlur"});
+    const getLatestId = () => {
+        if (chat?.messages?.length > 0) {
+            const latestIndex = chat?.messages?.length - 1;
+            const latestItem = chat?.messages[latestIndex];
+            return latestItem.id; // Assuming each item in the chat array has an 'id' property
+        }
+        return null; // Return null or some default value if the array is empty
+    };
+    const latestId = getLatestId();
+    console.log(latestId)
     const onSubmit = (data) => {
-        setPreview(null)
-        sendMessage.mutate(data, {
+        setPreview(null);
+        const tempId = Date.now();
+        const tempMessage = {
+            tempId: tempId, // Use a separate tempId
+            id: latestId, // The real id will come from the server
+            ...data,
+            is_sender: true,
+            time: new Date().toLocaleTimeString('fa-IR'),
+            day: new Date().toISOString(),
+        };
+        setTempMessages(prev => [...prev, tempMessage]);
+        setInputValue('');
+        // setChat(prev => ({
+        //     ...prev,
+        //     messages: Array.isArray(prev.messages) ? [...prev.messages, tempMessage] : [tempMessage]
+        // }));
+        // Save to local storage
+        const updatedTempMessages = [...tempMessages, tempMessage];
+        localStorage.setItem('tempMessages', JSON.stringify(updatedTempMessages));
+
+        sendMessage.mutate({...data, tempId: tempId}, {
             onSuccess: () => {
-                setInputValue('');
-                reset()
+                reset();
             }
         });
     };
@@ -69,9 +107,9 @@ export default function TicketChat() {
         setValue("text", newInputValue); // Update the form value
     }
 
-    const openEmoji = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
+    // const openEmoji = (event: React.MouseEvent<HTMLButtonElement>) => {
+    //     setAnchorEl(event.currentTarget);
+    // };
 
 
     const scrollToBottom = () => {
@@ -89,9 +127,7 @@ export default function TicketChat() {
                 // setOpenSnack(true);
                 // setStatus("success");
                 // setMessage("تیکت ارسال شد");
-                setTimeout(() => {
-                    scrollToBottom();
-                }, 3000)
+                scrollToBottom();
             },
             onError: () => {
                 setOpenSnack(true);
@@ -145,18 +181,41 @@ export default function TicketChat() {
         window.Echo.private(`messages.${params.id}`)
             .listen('MessageEvent', (data) => {
                 setChat(prev => {
+                    const prevMessages = Array.isArray(prev.messages) ? prev.messages : [];
+                    // Remove the temporary message
+                    console.log(prevMessages,"prev")
+                    console.log(data,"sync")
+                    const filteredMessages = prevMessages.filter(msg =>
+                        !(msg.tempId && msg.id === data.message.sync_id)
+                    );
                     return {
                         ...prev,
-                        messages: [...prev.messages, {
+                        messages: [...filteredMessages, {
                             ...data.message,
                             is_sender: data.message.user_id === prev.id
                         }]
                     };
                 });
+                console.log(tempMessages)
+                // Remove from tempMessages
+                setTempMessages(prev => prev.filter(msg =>
+                    !(msg.tempId && msg.id === data.message.sync_id)
+                ));
+                // Update local storage
+                localStorage.setItem('tempMessages', JSON.stringify(tempMessages.filter(msg =>
+                    !(msg.tempId && msg.id === data.message.sync_id)
+                )));
             });
     };
-
     useEffect(() => {
+        const storedTempMessages = JSON.parse(localStorage.getItem('tempMessages') || '[]');
+        console.log(storedTempMessages)
+        setTempMessages(storedTempMessages);
+        setChat(prev => ({
+            ...prev,
+            messages: Array.isArray(prev.messages) ? [...prev.messages, ...storedTempMessages] : storedTempMessages
+        }));
+
         connectWebSocket();
 
         return () => {
@@ -217,6 +276,7 @@ export default function TicketChat() {
                 setPreview({
                     file: file,
                     url: URL.createObjectURL(file),
+                    type:file.type
                 })
 
                 setValue("file", result)
@@ -258,28 +318,35 @@ export default function TicketChat() {
 
     const groupMessagesByDate = (messages) => {
         const groups = {};
-        messages.forEach(message => {
-            const date = new Date(message.day).toLocaleDateString('fa-IR');
-            if (!groups[date]) {
-                groups[date] = [];
-            }
-            groups[date].push(message);
-        });
+        if (Array.isArray(messages)) {
+            messages.forEach(message => {
+                if (message && message.day) {
+                    const date = new Date(message.day).toLocaleDateString('fa-IR');
+                    if (!groups[date]) {
+                        groups[date] = [];
+                    }
+                    groups[date].push(message);
+                }
+            });
+        }
         return groups;
     };
 
-    const toPersianNumber = (number) => {
+    const toPersianNumber = (time) => {
         const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-        return number.toString().replace(/\d/g, x => persianDigits[x]);
+        const [hours, minutes] = time.split(':');
+        return `${hours.replace(/\d/g, x => persianDigits[x])}:${minutes.replace(/\d/g, x => persianDigits[x])}`;
     };
 
     return (
         <Box position="absolute" onKeyDown={handleKeyDown} dir="rtl" height="92vh"
              sx={{
                  width: '100%',
-                 '@media (min-width: 900px)': {width: '91%',}, '@media (min-width: 1600px)': {width: '94.5%',}
-                 ,
-             }} marginTop={{xs: 9, md: 3}} p={{xs: 1, md: 7}}>
+                 '@media (min-width: 900px)': {width: '88%',},
+                 '@media (min-width: 1200px)': {width: '90%',}
+                 ,'@media (min-width: 1500px)': {width: '91.5%',}
+                 ,'@media (min-width: 1900px)': {width: '94%',}
+             }}  marginTop={{xs: 9, md: 3}} p={{xs: 1, md: 7}} >
             <Snackbar
                 open={openSnack}
                 autoHideDuration={6000}
@@ -324,7 +391,7 @@ export default function TicketChat() {
                         }}>
                             <Box width="100%" ref={chatBoxRef} display="flex" justifyContent="flex-end"
                                  flexDirection="column" p={1}>
-                                {Object.entries(groupMessagesByDate(chat?.messages || [])).map(([date, messages]) => (
+                                {Object.entries(groupMessagesByDate([...(chat?.messages || []), ...tempMessages])).map(([date, messages]) => (
                                     <Box key={date}>
                                         <Typography align="center" my={2} fontSize={12} color="gray">
                                             {date}
@@ -338,10 +405,15 @@ export default function TicketChat() {
                                                 gap={1}
                                             >
                                                 {item.type === 'audio' ? (
-                                                    <Box display="flex" alignItems="center" mt={1}>
-                                                        <audio src={item.audio} controls/>
-                                                        <Typography fontSize={10} color="gray">{toPersianNumber(item.time)}</Typography>
-                                                    </Box>
+                                                    <>
+                                                        {!item.is_sender && <Typography fontSize={10} mt={3}
+                                                                                        color="gray">{toPersianNumber(item.time)}</Typography>}
+                                                        <Box display="flex" width="50%" justifyContent={item.is_sender ? "flex-start" : "flex-end"} mt={1}>
+                                                            <audio src={item.audio} controls/>
+                                                        </Box>
+                                                        {item.is_sender && <Typography fontSize={10} mt={3}
+                                                                                       color="gray">{toPersianNumber(item.time)}</Typography>}
+                                                    </>
                                                 ) : imageTypes.includes(item.type) ? (
                                                     <>
                                                         {!item.is_sender && <Typography fontSize={10}
@@ -365,36 +437,36 @@ export default function TicketChat() {
                                                     <>
                                                         {!item.is_sender && <Typography mt={2.5} fontSize={10}
                                                                                         color="gray">{toPersianNumber(item.time)}</Typography>}
-                                                    <a
-                                                        href={`${window.location.origin}${item.url}`}
-                                                        style={{
-                                                            textDecoration: 'none',
-                                                            color: 'inherit',
-                                                            display: 'block',
-                                                            maxWidth: '50%'
-                                                        }}
-                                                    >
-                                                        <Typography
-                                                            bgcolor={theme.palette.Primary[30]}
-                                                            borderRadius="20px"
-                                                            width="100%"
-                                                            display="flex"
-                                                            justifyContent="center"
-                                                            alignItems="center"
-                                                            gap={1}
-                                                            p={1}
-                                                            mt={1}
+                                                        <a
+                                                            href={`${window.location.origin}${item.url}`}
                                                             style={{
-                                                                wordBreak: 'break-word',
-                                                                cursor: 'pointer'
+                                                                textDecoration: 'none',
+                                                                color: 'inherit',
+                                                                display: 'block',
+                                                                maxWidth: '50%'
                                                             }}
                                                         >
-                                                            {item.type}
-                                                            <FolderIcon/>
-                                                        </Typography>
-                                                    </a>
+                                                            <Typography
+                                                                bgcolor={item.is_sender ? "gray" : "white"}
+                                                                borderRadius="20px"
+                                                                width="100%"
+                                                                display="flex"
+                                                                justifyContent="center"
+                                                                alignItems="center"
+                                                                gap={1}
+                                                                p={1}
+                                                                mt={1}
+                                                                style={{
+                                                                    wordBreak: 'break-word',
+                                                                    cursor: 'pointer'
+                                                                }}
+                                                            >
+                                                                {item.type}
+                                                                <FolderIcon/>
+                                                            </Typography>
+                                                        </a>
                                                         {item.is_sender && <Typography mt={2.5} fontSize={10}
-                                                                                        color="gray">{toPersianNumber(item.time)}</Typography>}
+                                                                                       color="gray">{toPersianNumber(item.time)}</Typography>}
                                                     </>
                                                 ) : (
                                                     <>
@@ -473,31 +545,22 @@ export default function TicketChat() {
                                             showVisualizer={true}
                                         />
                                         <Box height="100%" display="flex" alignItems="center">
-                                            <IconButton id="basic-button" sx={{mx: 1}}
-                                                        aria-controls={openE ? 'basic-menu' : undefined}
-                                                        aria-haspopup="true"
-                                                        aria-expanded={openE ? 'true' : undefined}
-                                                        onClick={openEmoji}
-                                                        disabled={ticketClose}
+                                            {/*<IconButton id="basic-button" sx={{mx: 1}}*/}
+                                            {/*            aria-controls={openE ? 'basic-menu' : undefined}*/}
+                                            {/*            aria-haspopup="true"*/}
+                                            {/*            aria-expanded={openE ? 'true' : undefined}*/}
+                                            {/*            onClick={openEmoji}*/}
+                                            {/*            disabled={ticketClose}*/}
+                                            {/*>*/}
+                                            {/*    <SentimentSatisfiedOutlinedIcon/>*/}
+                                            {/*</IconButton>*/}
+                                            <IconButton
+                                                onClick={openEmoji}
+                                                disabled={ticketClose}
                                             >
-                                                <SentimentSatisfiedOutlinedIcon/>
+                                                <SentimentSatisfiedOutlinedIcon />
                                             </IconButton>
                                         </Box>
-                                        <Menu
-                                            sx={{position: "absolute", bottom: 90, padding: 0}}
-                                            id="basic-menu"
-                                            anchorEl={anchorEl}
-                                            open={openE}
-                                            onClose={handleClose}
-                                            MenuListProps={{
-                                                'aria-labelledby': 'basic-button',
-                                            }}
-                                        >
-                                            <MenuItem sx={{padding: 0}} disabled={ticketClose}>
-                                                <EmojiPicker height={500}
-                                                             onEmojiClick={onClickShowEmoji}/>
-                                            </MenuItem>
-                                        </Menu>
                                         <Box height="100%" display="flex" alignItems="center">
                                             <input accept="application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint,
                                                 text/plain, application/pdf, image/*" id="icon-button-file" type="file"
@@ -524,21 +587,50 @@ export default function TicketChat() {
                             overflowY: 'auto'
                         }}>
                             {file?.map((item, index) =>
-                                <Box display="flex" flexDirection="row" width="100%" height="40%" alignItems="center"
+                                <Box display="flex"  flexDirection="row" width={{md:'50%',lg:"88%",xs:"100%"}} height="40%" alignItems="center"
                                      gap={2}>
-                                    <img style={{
-                                        objectFit: "cover",
-                                        width: "50%",
-                                        height: "100%",
-                                        aspectRatio: "1/1",
-                                        borderRadius: 20,
-                                    }} src={item.url}
-                                         onClick={() => handleImageClick(item.url)}
-                                    />
-                                    <Box display="flex" flexDirection="column">
-                                        <Typography> ارسال شده در</Typography>
-                                        <Typography>{item.image_create}</Typography>
-                                    </Box>
+                                    {imageTypes.includes(item?.type) ?
+                                        <>
+                                            <img style={{
+                                                objectFit: "cover",
+                                                width: "50%",
+                                                height: "100%",
+                                                aspectRatio: "1/1",
+                                                borderRadius: 20,
+                                            }} src={item.url}
+                                                 onClick={() => handleImageClick(item.url)}
+                                            />
+                                            <Box display="flex" flexDirection="column">
+                                                <Typography> ارسال شده در</Typography>
+                                                <Typography>{item.image_create}</Typography>
+                                            </Box>
+                                        </>
+                                        :
+                                        <>
+                                            <Typography
+                                                bgcolor={theme.palette.Primary[30]}
+                                                borderRadius="20px"
+                                                width="100%"
+                                                display="flex"
+                                                justifyContent="center"
+                                                alignItems="center"
+                                                gap={1}
+                                                p={1}
+                                                mt={1}
+                                                style={{
+                                                    wordBreak: 'break-word',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                {item?.type}
+                                                <FolderIcon/>
+                                            </Typography>
+                                            <Box display="flex" flexDirection="column">
+                                                <Typography> ارسال شده در</Typography>
+                                                <Typography>{item.image_create}</Typography>
+                                            </Box>
+                                        </>
+                                    }
                                 </Box>
                             )}
                         </Box>
@@ -597,18 +689,40 @@ export default function TicketChat() {
                                     padding: "20px", // Added padding for better spacing
                                 }}
                             >
-                                <img
-                                    src={preview?.url}
-                                    alt="Full screen preview"
-                                    style={{
-                                        width: '100%', // Changed to 100% to fit the reduced box width
-                                        height: 'auto', // Changed to auto to maintain aspect ratio
-                                        maxHeight: '70vh', // Added max height to ensure it fits in the box
-                                        objectFit: 'contain',
-                                        borderRadius: "20px",
-                                        marginBottom: "10px" // Added margin to separate from the button
-                                    }}
-                                />
+                                {imageTypes.includes(preview?.type) ?
+                                    <img
+                                        src={preview?.url}
+                                        alt="Full screen preview"
+                                        style={{
+                                            width: '100%', // Changed to 100% to fit the reduced box width
+                                            height: 'auto', // Changed to auto to maintain aspect ratio
+                                            maxHeight: '70vh', // Added max height to ensure it fits in the box
+                                            objectFit: 'contain',
+                                            borderRadius: "20px",
+                                            marginBottom: "10px" // Added margin to separate from the button
+                                        }}
+                                    />
+                                    :
+                                    <Typography
+                                        bgcolor={theme.palette.Primary[30]}
+                                        borderRadius="20px"
+                                        width="100%"
+                                        display="flex"
+                                        justifyContent="center"
+                                        alignItems="center"
+                                        gap={1}
+                                        p={1}
+                                        mt={1}
+                                        style={{
+                                            wordBreak: 'break-word',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        {preview?.type}
+                                        <FolderIcon/>
+                                    </Typography>
+
+                                }
                                 <IconButton onClick={handleSubmit(onSubmit)}
                                             sx={{
                                                 backgroundColor: "#E0E0E0", // Added a background color
@@ -622,6 +736,49 @@ export default function TicketChat() {
                                 </IconButton>
                             </Box>
                         </Modal>
+                        <Modal
+                            open={emojiModalOpen}
+                            onClose={closeEmojiModal}
+                            aria-labelledby="emoji-modal"
+                            aria-describedby="emoji-picker-modal"
+                        >
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    bgcolor: 'background.paper',
+                                    boxShadow: 24,
+                                    p: 4,
+                                    borderRadius: 2,
+                                }}
+                            >
+                                <EmojiPicker
+                                    height={400}
+                                    width={350}
+                                    onEmojiClick={(emojiData, event) => {
+                                        onClickShowEmoji(emojiData, event);
+                                        // closeEmojiModal();
+                                    }}
+                                />
+                            </Box>
+                        </Modal>
+                        {/*<Menu*/}
+                        {/*    sx={{position: "absolute", bottom: 90, padding: 0}}*/}
+                        {/*    id="basic-menu"*/}
+                        {/*    anchorEl={anchorEl}*/}
+                        {/*    open={openE}*/}
+                        {/*    onClose={handleClose}*/}
+                        {/*    MenuListProps={{*/}
+                        {/*        'aria-labelledby': 'basic-button',*/}
+                        {/*    }}*/}
+                        {/*>*/}
+                        {/*    <MenuItem sx={{padding: 0}} disabled={ticketClose}>*/}
+                        {/*        <EmojiPicker height={500}*/}
+                        {/*                     onEmojiClick={onClickShowEmoji}/>*/}
+                        {/*    </MenuItem>*/}
+                        {/*</Menu>*/}
                     </Box>
                 </Box>
             </Grid>

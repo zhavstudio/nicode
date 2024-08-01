@@ -94,9 +94,9 @@ if (userDetails.isLoading){
     return (
         <Grid dir="rtl" container position="absolute" height="-webkit-fill-available" sx={{
             width: '100%', backgroundColor: "white", borderRadius: "20px",
-            '@media (min-width: 900px)': {width: '80%',},'@media (min-width: 1200px)': {width: '85%',},'@media (min-width: 1600px)': {width: '91%',}
+            '@media (min-width: 900px)': {width: '80%',},'@media (min-width: 1200px)': {width: '85%',},'@media (min-width: 1500px)': {width: '87%',},'@media (min-width: 1900px)': {width: '90%',}
             ,
-        }} marginTop={{xs: 9, md: "100px"}} ml={{xs:0,md:"50px"}}>
+        }} marginTop={{xs: 9, md: "100px"}} ml={{xs:0,md:"30px"}}>
             <Grid item xs={12} md={4} p={3} pl={0}>
 
                 <Box bgcolor={theme.palette.Primary[20]} padding={2} borderRadius={5} mb={2}>
