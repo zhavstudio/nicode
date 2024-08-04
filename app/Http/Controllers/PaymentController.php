@@ -24,7 +24,7 @@ class PaymentController
         $invoice->amount($amount);
 
         if ($request->input('page') == 1){
-            return Payment::callbackUrl(config('payment.drivers.zarinpal.callbackUrlWeb'))->purchase($invoice, function($driver, $transactionID) use($request, $amount) {
+            return Payment::config(['description'=> "Support Kargozareman" . auth()->user()->phone_number])->callbackUrl(config('payment.drivers.zarinpal.callbackUrlWeb'))->purchase($invoice, function($driver, $transactionID) use($request, $amount) {
                 $transaction = new Transaction([
                     'amount' => $amount,
                     'transactionID' => $transactionID
@@ -33,7 +33,7 @@ class PaymentController
                 $transaction->save();
             })->pay()->render();
         }else {
-            return Payment::callbackUrl(config('payment.drivers.zarinpal.callbackUrlApp'))->purchase($invoice, function($driver, $transactionID) use($request, $amount) {
+            return Payment::config(['description'=> "Support Kargozareman" . auth()->user()->phone_number])->callbackUrl(config('payment.drivers.zarinpal.callbackUrlApp'))->purchase($invoice, function($driver, $transactionID) use($request, $amount) {
                 $transaction = new Transaction([
                     'amount' => $amount,
                     'transactionID' => $transactionID

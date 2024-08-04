@@ -23,3 +23,4 @@ yarn-error.log
 composer.lock
 nicode.zip
 *.zip
+.env*
