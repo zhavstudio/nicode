@@ -19,22 +19,23 @@ class PaymentController
         ]);
 
         $invoice = new Invoice();
+        $amount = str_replace(',', '', $request['amount']);
 
-        $invoice->amount($request['amount']);
+        $invoice->amount($amount);
 
         if ($request->input('page') == 1){
-            return Payment::callbackUrl(config('payment.drivers.zarinpal.callbackUrlWeb'))->purchase($invoice, function($driver, $transactionID) use($request) {
+            return Payment::callbackUrl(config('payment.drivers.zarinpal.callbackUrlWeb'))->purchase($invoice, function($driver, $transactionID) use($request, $amount) {
                 $transaction = new Transaction([
-                    'amount' => $request['amount'],
+                    'amount' => $amount,
                     'transactionID' => $transactionID
                 ]);
                 $transaction->wallet()->associate(auth()->user()->wallet);
                 $transaction->save();
             })->pay()->render();
         }else {
-            return Payment::callbackUrl(config('payment.drivers.zarinpal.callbackUrlApp'))->purchase($invoice, function($driver, $transactionID) use($request) {
+            return Payment::callbackUrl(config('payment.drivers.zarinpal.callbackUrlApp'))->purchase($invoice, function($driver, $transactionID) use($request, $amount) {
                 $transaction = new Transaction([
-                    'amount' => $request['amount'],
+                    'amount' => $amount,
                     'transactionID' => $transactionID
                 ]);
                 $transaction->wallet()->associate(auth()->user()->wallet);

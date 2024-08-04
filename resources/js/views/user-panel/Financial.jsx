@@ -29,6 +29,7 @@ import axios from "@/axiosConfig.js";
 import {route} from "@/views/user-panel/helpers.js";
 import { useForm } from "react-hook-form";
 import SearchIcon from "@mui/icons-material/Search.js";
+import {NumericFormat} from "react-number-format";
 
 
 const columns = [
@@ -54,7 +55,29 @@ const columns = [
 function createData(id, amount, date, status) {
     return {id, amount, date, status};
 }
+const NumericFormatCustom = React.forwardRef(
+    function NumericFormatCustom(props, ref) {
+        const { onChange, ...other } = props;
 
+        return (
+            <NumericFormat
+                {...other}
+                getInputRef={ref}
+                onValueChange={(values) => {
+                    onChange({
+                        target: {
+                            name: props.name,
+                            value: values.value,
+                        },
+                    });
+                }}
+                thousandSeparator
+                valueIsNumericString
+                prefix=""
+            />
+        );
+    },
+);
 
 export default function Financial() {
 
@@ -64,24 +87,16 @@ export default function Financial() {
     const [searchTerm, setSearchTerm] = React.useState('');
     const navigate = useNavigate();
 
-    const formatNumber = (value) => {
-        return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    };
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
         setPage(0); // Reset to first page when searching
     };
 
-    const handleChange = (event) => {
-        const { value } = event.target;
-        const numericValue = value.replace(/,/g, '');
-        event.target.value = formatNumber(numericValue);
-    };
-    function numberToWords(number) {
+    function numberToWords(value) {
         const ones = ['', 'یک', 'دو', 'سه', 'چهار', 'پنج', 'شش', 'هفت', 'هشت', 'نه'];
         const tens = ['', '', 'بیست', 'سی', 'چهل', 'پنجاه', 'شصت', 'هفتاد', 'هشتاد', 'نود'];
         const hundreds = ['', 'صد', 'دویست', 'سیصد', 'چهارصد', 'پانصد', 'ششصد', 'هفتصد', 'هشتصد', 'نهصد'];
-
+        let number = value?.replace(/,/g, '')
         function convertThreeDigits(num) {
             let word = '';
             const hundreds_digit = Math.floor(num / 100);
@@ -289,10 +304,12 @@ export default function Financial() {
                                 <Divider sx={{width: "100%"}}/>
                                 <img src={wallet} style={{marginTop: 20, marginBottom: 10}}/>
                                 <Typography fontSize={15}>میزان اعتبار مورد نظر خود را وارد نمایید</Typography>
-                                <TextField onChange={handleChange} placeholder='مثلا 200,000'
+                                <TextField  placeholder='مثلا 200,000'
                                     {...register("amount", {
                                     required: true,maxLength:10
-                                })} required type="number" id="outlined-required"
+                                })} InputProps={{
+                                    inputComponent: NumericFormatCustom,
+                                }} required  id="outlined-required"
                                     sx={{width: "100%", marginBottom: 2}}/>
                                 {watch('amount') !== '' && <Typography style={{marginBottom:20}}>{numberToWords(watch('amount'))}</Typography>}
 

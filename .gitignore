@@ -22,3 +22,4 @@ yarn-error.log
 /resources/js/views/user-panel/routes.json
 composer.lock
 nicode.zip
+*.zip
