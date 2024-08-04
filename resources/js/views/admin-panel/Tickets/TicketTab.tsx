@@ -1,7 +1,7 @@
 import React from 'react'
 import {Box, Button, Grid, InputAdornment, InputBase} from "@mui/material";
 import Paper from "@mui/material/Paper";
-import {Link as RouterLink} from "react-router-dom";
+import {Link as RouterLink, useNavigate} from "react-router-dom";
 import theme from "@/Custom.js";
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
@@ -20,6 +20,7 @@ export default function TicketTab(){
     const [value, setValue] = React.useState('1');
     const [assignedTickets, setAssignedTickets] = React.useState([]);
     const [unassignedTickets, setUnassignedTickets] = React.useState([]);
+    const navigate = useNavigate();
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -41,6 +42,11 @@ export default function TicketTab(){
         );
         assignedTicket.data = data.data;
         return assignedTicket;
+    },{
+        onError:(e)=>{
+            if (e.response.status === 401){
+                navigate('/', { replace: true })}
+        }
     });
 
     const unassignedTicket = useQuery("Ticket", async () => {
@@ -50,6 +56,11 @@ export default function TicketTab(){
         unassignedTicket.data = data.data;
         setUnassignedTickets(data.data)
         return unassignedTicket;
+    },{
+        onError:(e)=>{
+            if (e.response.status === 401){
+                navigate('/', { replace: true })}
+        }
     });
 
     React.useEffect(() => {

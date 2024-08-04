@@ -22,7 +22,7 @@ import {
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from '@mui/icons-material/Search';
 import theme from "./../../Custom";
-import {Link as RouterLink} from 'react-router-dom';
+import {Link as RouterLink, useNavigate} from 'react-router-dom';
 import {useMutation, useQuery} from "react-query";
 import {route} from './helpers'
 import axios from './../../axiosConfig';
@@ -94,6 +94,7 @@ export default function Ticket() {
         setSearchTerm(event.target.value);
         setPage(0); // Reset to first page when searching
     };
+    const navigate = useNavigate();
 
     const style = {
         position: 'absolute',
@@ -144,6 +145,13 @@ export default function Ticket() {
         setOrder('asc');
         setOrderBy('size');
         return Ticket;
+    },{
+        onError:(e)=>{
+            console.log(e)
+            if (e.response.status === 401){
+                navigate('/', { replace: true });
+            }
+        }
     });
 
     const firstTicket = useMutation(async (data) => {
@@ -157,10 +165,12 @@ export default function Ticket() {
                 setMessage("تیکت ارسال شد");
                 Ticket.refetch()
             },
-            onError: () => {
+            onError: (e) => {
                 setOpenSnack(true);
                 setStatus("error");
                 setMessage("ارسال تیکت مشکل مواجه شد");
+                if (e.response.status === 401){
+                    navigate('/', { replace: true })}
             },
             onSettled: () => {
             },

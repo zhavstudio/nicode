@@ -22,7 +22,7 @@ export default function Contents() {
                         <Route path="ticket" element={<Ticket/>}/>
                         <Route path="chat/:id" element={<TicketChat/>}/>
                         <Route path="financial" element={<AllTransactions/>}/>
-                        <Route path="account_info" element={<Financial/>}/>
+                        {/*<Route path="account_info" element={<Financial/>}/>*/}
                         <Route path="users" element={<Users/>}/>
                         <Route path="users/:id" element={<UsersDetails/>}/>
                     </Route>

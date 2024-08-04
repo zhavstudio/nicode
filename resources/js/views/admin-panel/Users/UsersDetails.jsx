@@ -1,7 +1,7 @@
 import React from 'react'
 import {Box, Button, Divider, Grid, InputAdornment, InputBase, Typography} from "@mui/material";
 import Paper from "@mui/material/Paper";
-import {Link as RouterLink, useParams} from "react-router-dom";
+import {Link as RouterLink, useNavigate, useParams} from "react-router-dom";
 import theme from "./../../../Custom";
 import UsersDetailsTab from "./UsersDetailsTab";
 import {useQuery} from "react-query";
@@ -14,6 +14,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 export default function UsersDetails() {
 
     const params = useParams();
+    const navigate = useNavigate();
 
     const userDetails = useQuery("userDetails", async () => {
         const { data } = await axios.get(
@@ -21,6 +22,11 @@ export default function UsersDetails() {
         );
         userDetails.data = data.data;
         return userDetails;
+    },{
+        onError:(e)=>{
+            if (e.response.status === 401){
+                navigate('/', { replace: true })}
+        }
     });
 
     function numberToWords(number) {

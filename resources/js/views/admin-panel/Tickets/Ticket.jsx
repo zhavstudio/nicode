@@ -11,7 +11,7 @@ import {alpha, Box, Button, Grid, InputAdornment, InputBase, useMediaQuery} from
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from '@mui/icons-material/Search';
 import theme from "../../../Custom.js";
-import { Link as RouterLink } from 'react-router-dom';
+import {Link as RouterLink, useNavigate} from 'react-router-dom';
 import {useQuery} from "react-query";
 import {route} from '../helpers.js'
 import axios from '../../../axiosConfig.js';
@@ -71,6 +71,7 @@ function createData(id, title, population, size , density, status) {
 export default function Ticket() {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const navigate = useNavigate();
 
     const isXsScreen = useMediaQuery('(max-width:599px)');
     const isMdOrHigher = useMediaQuery('(min-width:900px)');
@@ -90,6 +91,11 @@ export default function Ticket() {
         );
         Ticket.data = data.data;
         return Ticket;
+    },{
+        onError:(e)=>{
+            if (e.response.status === 401){
+                navigate('/', { replace: true })}
+        }
     });
 
 

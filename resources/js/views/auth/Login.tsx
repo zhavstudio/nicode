@@ -3,17 +3,20 @@ import {Box, Button, Divider, Grid, List, ListItem, ListItemText, TextField, Typ
 import theme from "./../../Custom"
 import logo from "./../../assets/logo.svg"
 import {Link as RouterLink, Link, Navigate} from "react-router-dom";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import axios from './../../axiosConfig';
 import {useMutation, useQuery} from "react-query";
 import {route} from './helpers'
 import { useNavigate } from 'react-router-dom';
-
+import Otp from './Otp'
 
 
 export default function Login() {
 
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [showOtp, setShowOtp] = useState(false);
+
+
     const handlePhoneNumberChange = (event) => {
         const value = event.target.value;
         setPhoneNumber(value);
@@ -39,21 +42,35 @@ export default function Login() {
 
     const handleSubmit = () => {
         if (!isButtonDisabled) {
-            register.mutate({ phone_number: phoneNumber });
-        }
-    };
+            register.mutate({ phone_number: phoneNumber });}
+        setShowOtp(true);
+    }
 
     const handleKeyDown = (event) => {
         console.log(event.key)
         if (event.key === 'Enter') {
             handleSubmit();
-            navigate('/otp', { replace: true });
         }
     };
 
+    useEffect(()=>{
+        setShowOtp(false)
+    },[])
+
+    const handleShowOtp = () =>{
+        setShowOtp(false)
+    }
+
+    const retry = () =>{
+        register.mutate({ phone_number: phoneNumber })
+    }
+
+    if (showOtp){
+        return <Otp showOtp={handleShowOtp} retry={retry}/>
+    }
     return (
         <Grid container display='flex' flexDirection='row' justifyContent='space-between' p={{xs:0,md:5}}>
-            <Grid item xs={12} md={5} borderRadius={2} height={{md:'90vh',xs:'60vh'}} bgcolor={theme.palette.Secondary.main}>
+            <Grid item xs={12} md={5} borderRadius={2} height={{md:'90vh',xs:window.screen.height - 500}} bgcolor={theme.palette.Secondary.main}>
                 <Box
                     display="flex"
                     justifyContent="center"
@@ -115,7 +132,7 @@ export default function Login() {
                 <Button
                     onClick={handleSubmit}
                     variant="contained"
-                    component={RouterLink} to="/otp"
+                    // component={RouterLink} to="/otp"
                     sx={{
                         width: '50%',
                         color: theme.palette.common.white,

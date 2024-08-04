@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import theme from "@/Custom.js";
 import Paper from "@mui/material/Paper";
-import {Link as RouterLink} from "react-router-dom";
+import {Link as RouterLink, useNavigate} from "react-router-dom";
 import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
 import TableHead from "@mui/material/TableHead";
@@ -62,6 +62,7 @@ export default function Financial() {
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const [open, setOpen] = React.useState(false);
     const [searchTerm, setSearchTerm] = React.useState('');
+    const navigate = useNavigate();
 
     const formatNumber = (value) => {
         return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -159,6 +160,11 @@ export default function Financial() {
         );
         transactions.data = data.data;
         return transactions;
+    },{
+        onError:(e)=>{
+            if (e.response.status === 401){
+                navigate('/', { replace: true })}
+        }
     });
 
     const totalBalance = useQuery("totalBalance", async () => {

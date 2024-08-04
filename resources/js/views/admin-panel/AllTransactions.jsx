@@ -11,7 +11,7 @@ import {alpha, Box, Button, Grid, InputAdornment, InputBase, useMediaQuery} from
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from '@mui/icons-material/Search';
 import theme from "./../../Custom";
-import {Link as RouterLink} from 'react-router-dom';
+import {Link as RouterLink, useNavigate} from 'react-router-dom';
 import {useQuery} from "react-query";
 import {route} from './helpers'
 import axios from './../../axiosConfig';
@@ -71,6 +71,7 @@ export default function AllTransactions() {
     const [searchTerm, setSearchTerm] = React.useState('');
     const [order, setOrder] = React.useState('desc');
     const [orderBy, setOrderBy] = React.useState('population');
+    const navigate = useNavigate();
 
     const handleRequestSort = (property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -97,7 +98,14 @@ export default function AllTransactions() {
         );
         Transactions.data = data.data;
         handleRequestSort('population')
+        setOrder('asc');
+        setOrderBy('size');
         return Transactions;
+    },{
+        onError:(e)=>{
+            if (e.response.status === 401){
+                navigate('/', { replace: true })}
+        }
     });
 
     const backgroundColors = (Status) => {

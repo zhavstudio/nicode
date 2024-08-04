@@ -14,22 +14,16 @@ import {useSelector} from "react-redux";
 
 const App = () => {
     const auth1 = useSelector((state) => state.information.isAuthenticated);
-
-    const [isAuthenticated, setIsAuthenticated] = useState(auth1);
     const [userRole, setUserRole] = useState('');
     const [loading, setLoading] = useState(true);
 
 
-
     useEffect(() => {
-        const auth = localStorage.getItem('token');
         const role = localStorage.getItem('role');
-        console.log(auth !== null)
-        setIsAuthenticated(auth !== null);
         setUserRole(role || '');
         setLoading(false);
     }, [auth1]);
-    console.log(isAuthenticated)
+    // console.log(auth1.isAuthenticated)
 
     console.log("app.tsx")
     const queryClient = new QueryClient({
@@ -50,11 +44,11 @@ const App = () => {
                 <Router>
                     <Routes>
                         <Route path="/" element={<Login />} />
-                        <Route path="/otp" element={<Otp />} />
+                        {/*<Route path="/otp" element={<Otp />} />*/}
                         <Route
                             path="/panel/*"
                             element={
-                                isAuthenticated ? (
+                                localStorage.getItem('token') !== null ? (
                                     userRole === 'admin' ? (
                                         <AdminPanel />
                                     ) : (
@@ -65,7 +59,7 @@ const App = () => {
                                 )
                             }
                         />
-                        <Route path="*" element={<Navigate to={auth1 ? '/panel' : '/'} replace />} />
+                        <Route path="*" element={<Navigate to={localStorage.getItem('token') !== null ? '/panel' : '/'} replace />} />
                     </Routes>
                 </Router>
             </ThemeProvider>
