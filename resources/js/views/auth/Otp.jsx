@@ -13,9 +13,10 @@ import SaveIcon from '@mui/icons-material/Save';
 import {useDispatch, useSelector} from "react-redux";
 import {setAuth} from "@/redux/actions.js";
 import {Alert, LoadingButton} from "@mui/lab";
+import ReplayIcon from '@mui/icons-material/Replay';
+import IconButton from "@mui/material/IconButton";
 
-
-export default function Otp() {
+export default function Otp({showOtp,retry}) {
 
     const [otp, setOtp] = React.useState('')
     const [disable, setDisable] = React.useState(true)
@@ -24,17 +25,45 @@ export default function Otp() {
     const [status, setStatus] = React.useState("success");
     const [message, setMessage] = React.useState("This is a success message!");
     const navigate = useNavigate();
+    const [countdown, setCountdown] = React.useState(30);
+    const [isTimerRunning, setIsTimerRunning] = React.useState(true);
 
-    // function handleClick() {
-    //     setLoading(true);
-    // }
+    // Add this useEffect for the countdown timer
+    useEffect(() => {
+        let timer;
+        if (isTimerRunning && countdown > 0) {
+            timer = setInterval(() => {
+                setCountdown((prevCountdown) => prevCountdown - 1);
+            }, 1000);
+        } else if (countdown === 0) {
+            setIsTimerRunning(false);
+        }
+
+        return () => {
+            if (timer) clearInterval(timer);
+        };
+    }, [countdown, isTimerRunning]);
+
+    useEffect(() => {
+        if ('OTPCredential' in window) {
+            navigator.credentials.get({
+                otp: { transport:['sms'] },
+                signal: AbortSignal.timeout(120000) // Waits for 2 minutes
+            }).then(otp => {
+                setOtp(otp.code);
+                handleOtp(otp.code);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    }, []);
 
     const dispatch = useDispatch();
 
 
-    const handleChange = (newValue) => {
-        setOtp(newValue)
-    }
+    // const handleChange = (newValue) => {
+    //     setOtp(newValue)
+    // }
 
 
     const login = useMutation(async (data) => {
@@ -62,6 +91,13 @@ export default function Otp() {
 
     const phone = localStorage.getItem("phone")
 
+    const handleChange = (newValue) => {
+        setOtp(newValue);
+        if (newValue.length === 6) {
+            handleOtp(newValue);
+        }
+    }
+
     const handleOtp = (newValue) => {
         login.mutate({verification_code: newValue, phone_number: phone})
         setDisable(false)
@@ -74,6 +110,12 @@ export default function Otp() {
             navigate('/panel', { replace: true });
         }
     };
+
+    const handleRetry = () => {
+        retry()
+        setCountdown(30)
+        setIsTimerRunning(true)
+    }
 
 
     return (
@@ -96,7 +138,7 @@ export default function Otp() {
                     {message}
                 </Alert>
             </Snackbar>
-            <Grid item xs={12} md={5} borderRadius={2} height={{md: '90vh', xs: '60vh'}}
+            <Grid item xs={12} md={5} borderRadius={2} height={{md: '90vh', xs:window.screen.height - 500}}
                   bgcolor={theme.palette.Secondary.main}>
                 <Box
                     display="flex"
@@ -123,6 +165,22 @@ export default function Otp() {
                 <Typography fontFamily='Dana' fontWeight='900' fontSize={{xs: 30, md: 50}} color='rgba(0, 25, 73, 1)'>
                     تایید هویت
                 </Typography>
+                    {countdown > 0
+                        ?                 <Typography fontFamily='Dana' mt={2}>
+                            زمان باقی مانده:<span style={{fontFamily: 'Dana',
+                            fontWeight: '500',
+                            color: theme.palette.secondary.main}}> {countdown} ثانیه  </span></Typography>
+
+                        :
+                        <>
+                        <Typography>
+                            زمان به پایان رسید. لطفا دوباره تلاش کنید
+                        </Typography>
+                            <IconButton>
+                                <ReplayIcon onClick={handleRetry}/>
+                            </IconButton>
+                        </>
+                    }
                 <Divider width='50%'/>
                 <List sx={{listStyleType: 'none', padding: 0, marginTop: '20px'}}>
                     <ListItem
@@ -151,8 +209,19 @@ export default function Otp() {
                         </Typography>
                     </ListItem>
                 </List>
-                <MuiOtpInput marginY='30px' display='flex' length={6} width={{xs: '90%', md: '50%'}} value={otp}
-                             onComplete={handleOtp} onChange={handleChange}/>
+                <MuiOtpInput
+                    marginY='30px'
+                    display='flex'
+                    length={6}
+                    width={{xs: '90%', md: '50%'}}
+                    value={otp}
+                    onComplete={handleOtp}
+                    onChange={handleChange}
+                    inputProps={{
+                        autocomplete: "one-time-code",
+                        inputmode: "numeric"
+                    }}
+                />
                 <LoadingButton
                     color="secondary"
                     component={RouterLink} to="/panel"
@@ -169,6 +238,18 @@ export default function Otp() {
                 >
                     ورود
                 </LoadingButton>
+                <Button
+                    onClick={showOtp}
+                    sx={{
+                    width: '30%',
+                    color: theme.palette.common.white,
+                    backgroundColor: theme.palette.secondary.main,
+                    borderRadius: '100px',
+                    mt:2
+                }}
+                         variant="contained">
+                    اصلاح شماره موبایل
+                </Button>
             </Grid>
         </Grid>
     )

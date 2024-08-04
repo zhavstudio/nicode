@@ -18,7 +18,7 @@ import SendIcon from '@mui/icons-material/Send';
 import axios from './../../../axiosConfig';
 import {useMutation, useQuery} from "react-query";
 import {route} from './../helpers'
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {Alert} from "@mui/lab";
 import {AudioRecorder} from 'react-audio-voice-recorder';
 import EmojiPicker, {EmojiClickData} from "emoji-picker-react";
@@ -42,6 +42,7 @@ export default function TicketChat() {
     const openE = Boolean(anchorEl);
     const [tempMessages, setTempMessages] = useState([]);
     const [emojiModalOpen, setEmojiModalOpen] = useState(false);
+    const navigate = useNavigate();
 
     const openEmoji = () => {
         setEmojiModalOpen(true);
@@ -64,9 +65,9 @@ export default function TicketChat() {
         if (chat?.messages?.length > 0) {
             const latestIndex = chat?.messages?.length - 1;
             const latestItem = chat?.messages[latestIndex];
-            return latestItem.id; // Assuming each item in the chat array has an 'id' property
+            return latestItem.id;
         }
-        return null; // Return null or some default value if the array is empty
+        return null;
     };
     const latestId = getLatestId();
     console.log(latestId)
@@ -181,6 +182,11 @@ export default function TicketChat() {
                 scrollToBottom();
             }, 1000)
             SetTicketClose(data?.status === 4)
+        }
+    },{
+        onError:(e)=>{
+            if (e.response.status === 401){
+                navigate('/', { replace: true })}
         }
     });
 
@@ -380,7 +386,7 @@ export default function TicketChat() {
         return `${hours.replace(/\d/g, x => persianDigits[x])}:${minutes.replace(/\d/g, x => persianDigits[x])}`;
     };
     return (
-        <Box position="absolute" onKeyDown={handleKeyDown} dir="rtl" height="92vh"
+        <Box position="fixed" onKeyDown={handleKeyDown} dir="rtl" height="92vh"
              sx={{
                  width: '100%',
                  '@media (min-width: 900px)': {width: '88%',},
@@ -426,8 +432,7 @@ export default function TicketChat() {
                         </Typography>
                         {/*<Typography>آخرین آپدیت در{Messages?.data?.update}</Typography>*/}
                         <Box sx={{
-                            height: {xs: "640px", md: "363px"},
-                            '@media (min-width: 1600px)': {height: '700px',},
+                            height: window.screen.height - 300,
                             overflowY: 'auto'
                         }}>
                             <Box width="100%" ref={chatBoxRef} display="flex" justifyContent="flex-end"
@@ -632,8 +637,7 @@ export default function TicketChat() {
                         <Divider sx={{mt: "10px"}}/>
                         <Typography mt={2} fontWeight="500">فایل های پیوست</Typography>
                         <Box display="flex" gap={2} flexDirection="column" width="463px" sx={{
-                            height: {xs: "300px", md: "363px"},
-                            '@media (min-width: 1600px)': {height: '700px',},
+                            height: window.screen.height - 300,
                             overflowY: 'auto'
                         }}>
                             {file?.map((item, index) =>
@@ -651,7 +655,7 @@ export default function TicketChat() {
                                          onClick={() => handleImageClick(item.url)}
                                     />
                                     <Box display="flex" flexDirection="column">
-                                        <Typography> ارسال شده در</Typography>
+                                        {/*<Typography> ارسال شده در</Typography>*/}
                                         <Typography>{item.image_create}</Typography>
                                     </Box>
                                         </>

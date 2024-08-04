@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
+import {Route, Routes, Navigate, useNavigate} from "react-router-dom";
 import Ticket from "./Ticket";
 import Financial from "./Financial";
 import TicketChat from "./TicketChat";
@@ -7,17 +7,27 @@ import { useQuery, useMutation } from "react-query";
 import axios from "@/axiosConfig.js";
 import { route } from "@/views/user-panel/helpers.js";
 import CircularProgress from '@mui/material/CircularProgress';
+import {setAuth} from "./../../redux/actions";
+import {useDispatch} from "react-redux";
 
 
 export default function Contents() {
     const [initialPath, setInitialPath] = React.useState(null);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const ticket = useQuery("ticket", async () => {
         const { data } = await axios.get(
             route("api.web.v1.user.userTicket")
         );
         return data;
-    });
+    },{
+        onError:(e)=>{
+            if (e.response.status === 401){
+                dispatch(setAuth(false))
+                navigate('/', { replace: true });
+            }
+        }});
 
     const createTicket = useMutation(async () => {
         const { data } = await axios.post(
@@ -29,7 +39,7 @@ export default function Contents() {
 
     React.useEffect(() => {
         if (ticket.isSuccess) {
-            const answered = ticket.data?.data.filter((item) => item.status === "پاسخ داده شده");
+            const answered = ticket.data?.data.filter((item) => item.status !== "بسته");
             const defaultTicket = ticket.data?.data.find((item) => item.title === "پیشفرض" && item.message.length === 0);
 
             if (answered && answered.length > 0) {
