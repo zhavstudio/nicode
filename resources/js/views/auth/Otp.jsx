@@ -50,6 +50,7 @@ export default function Otp({showOtp,retry}) {
                 otp: { transport:['sms'] },
                 signal: AbortSignal.timeout(120000) // Waits for 2 minutes
             }).then(otp => {
+                console.log(otp,"code")
                 setOtp(otp.code);
                 handleOtp(otp.code);
             }).catch(err => {
