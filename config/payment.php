@@ -321,7 +321,7 @@ return [
             'merchantId' => env('ZARINPAL_MERCHANT_ID'),
             'callbackUrlWeb' => env('ZARINPAL_CALLBACKURL_WEB'),
             'callbackUrlApp' => env('ZARINPAL_CALLBACKURL_APP'),
-            'description' => 'payment using zarinpal',
+            'description' => 'payment using zarinpal Support Kargozareman',
             'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
         'zibal' => [
