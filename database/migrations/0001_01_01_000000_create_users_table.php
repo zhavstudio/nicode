@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
             $table->tinyInteger('gender')->default(UserGenderEnum::male);
-            $table->string('code_meli')->unique()->nullable();
-            $table->string('email')->unique()->nullable();
+            $table->string('code_meli')->nullable();
+            $table->string('email')->nullable();
             $table->string('phone_number')->unique();
             $table->integer('verification_code')->nullable();
             $table->dateTime('verification_code_expire')->nullable();

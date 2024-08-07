@@ -100,4 +100,30 @@ class LaratrustSeeder extends Seeder
 
         Schema::enableForeignKeyConstraints();
     }
+
+//    This Function is for SQL Server
+//    public function truncateLaratrustTables()
+//    {
+//        $this->command->info('Truncating User, Role and Permission tables');
+//        Schema::disableForeignKeyConstraints();
+//
+//        DB::table('permission_role')->delete();
+//        DB::table('permission_user')->delete();
+//        DB::table('role_user')->delete();
+//
+//        if (Config::get('laratrust_seeder.truncate_tables')) {
+//            DB::table('roles')->delete();
+//            DB::statement('DBCC CHECKIDENT (roles, RESEED, 0)');
+//            DB::table('permissions')->delete();
+//            DB::statement('DBCC CHECKIDENT (permissions, RESEED, 0)');
+//
+//            if (Config::get('laratrust_seeder.create_users')) {
+//                $usersTable = (new \App\Models\User)->getTable();
+//                DB::table($usersTable)->delete();
+//                DB::statement("DBCC CHECKIDENT ($usersTable, RESEED, 0)");
+//            }
+//        }
+//
+//        Schema::enableForeignKeyConstraints();
+//    }
 }

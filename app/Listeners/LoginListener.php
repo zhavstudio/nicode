@@ -26,13 +26,13 @@ use App\RahyabSMS\SendSMS;
         $patternValues = [
             "code"         => $event->user->verification_code
         ];
-        if (config('app.env') !== 'local'){
-            $this->FARAZAMAN_SMS_PANEL(config("app.FARAZ.FARAZ_PATTERN_LOGIN_SUCCESS", null), preg_replace('/^0/', '', $event->user->phone_number), $patternValues);
-            info('New login code sent to'. $event->user->phone_number);
-        }
 //        if (config('app.env') !== 'local'){
-//            $this->sms->sendSingleSMS($message, $event->user->phone_number, $event->user->verification_code);
+//            $this->FARAZAMAN_SMS_PANEL(config("app.FARAZ.FARAZ_PATTERN_LOGIN_SUCCESS", null), preg_replace('/^0/', '', $event->user->phone_number), $patternValues);
 //            info('New login code sent to'. $event->user->phone_number);
 //        }
+        if (config('app.env') !== 'local'){
+            $this->sms->sendSingleSMS($message, $event->user->phone_number, $event->user->verification_code);
+            info('New login code sent to'. $event->user->phone_number);
+        }
     }
 }
