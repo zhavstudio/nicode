@@ -20,17 +20,18 @@ import {useMutation, useQuery} from "react-query";
 import {route} from './../helpers'
 import {useNavigate, useParams} from "react-router-dom";
 import {Alert} from "@mui/lab";
-import {AudioRecorder} from 'react-audio-voice-recorder';
+import {AudioRecorder, useAudioRecorder} from 'react-audio-voice-recorder';
 import EmojiPicker, {EmojiClickData} from "emoji-picker-react";
 import SentimentSatisfiedOutlinedIcon from "@mui/icons-material/SentimentSatisfiedOutlined";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ClearIcon from '@mui/icons-material/Clear';
 import {useForm} from "react-hook-form";
 import FolderIcon from "@mui/icons-material/Folder";
+import { LinearProgress } from "@mui/material";
 
 export default function TicketChat() {
 
-    const [age, setAge] = React.useState('');
+    const [sendImage, setSendImage] = React.useState(false);
     const [inputValue, setInputValue] = useState('');
     const [chat, setChat] = React.useState([]);
     const params = useParams();
@@ -42,7 +43,11 @@ export default function TicketChat() {
     const openE = Boolean(anchorEl);
     const [tempMessages, setTempMessages] = useState([]);
     const [emojiModalOpen, setEmojiModalOpen] = useState(false);
+    const [tempAudioMessages, setTempAudioMessages] = useState([]);
+    const [uplodaing, setUploading] = React.useState(false);
+    const [Form,setForm] = React.useState(null)
     const navigate = useNavigate();
+    const recorderControls = useAudioRecorder()
 
     const openEmoji = () => {
         setEmojiModalOpen(true);
@@ -73,6 +78,7 @@ export default function TicketChat() {
     console.log(latestId)
     const onSubmit = (data) => {
         setPreview(null);
+        setSendImage(false)
         const tempId = Date.now();
         const tempMessage = {
             tempId: tempId, // Use a separate tempId
@@ -191,37 +197,34 @@ export default function TicketChat() {
     });
 
     const TempFiles = useMutation(async (formData) => {
-            console.log(formData)
-            const response = await axios.post(route("api.web.v1.admin.temporary-file.store"), formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            return response.data;
-        }, {
-            onSuccess: (data) => {
-
+        console.log(formData)
+        const response = await axios.post(route("api.web.v1.admin.temporary-file.store"), formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
             },
-            onError: () => {
-
-            },
-            onSettled: () => {
-            },
-        }
-    )
+        });
+        return response.data;
+    }, {
+        onSuccess: (data) => {
+            setUploading(false)
+            setForm(null)
+            setSendImage(true)
+        },
+        onError: () => {
+            setUploading(true)
+        },
+    });
     //WebSocket config
     const connectWebSocket = () => {
         window.Echo.private(`messages.${params.id}`)
             .listen('MessageEvent', (data) => {
                 setChat(prev => {
                     const prevMessages = Array.isArray(prev.messages) ? prev.messages : [];
-                    // Find the index of the temporary message
                     const tempIndex = prevMessages.findIndex(msg =>
                         msg.tempId && msg.id === data.message.sync_id
                     );
 
                     if (tempIndex !== -1) {
-                        // If found, replace the temporary message
                         const updatedMessages = [...prevMessages];
                         updatedMessages[tempIndex] = {
                             ...data.message,
@@ -229,7 +232,6 @@ export default function TicketChat() {
                         };
                         return { ...prev, messages: updatedMessages };
                     } else {
-                        // If not found, add the new message
                         return {
                             ...prev,
                             messages: [...prevMessages, {
@@ -239,8 +241,12 @@ export default function TicketChat() {
                         };
                     }
                 });
-                // Remove from tempMessages
+
+                // Remove from tempMessages and tempAudioMessages
                 setTempMessages(prev => prev.filter(msg =>
+                    !(msg.tempId && msg.id === data.message.sync_id)
+                ));
+                setTempAudioMessages(prev => prev.filter(msg =>
                     !(msg.tempId && msg.id === data.message.sync_id)
                 ));
 
@@ -249,17 +255,23 @@ export default function TicketChat() {
                     JSON.parse(localStorage.getItem('tempMessages') || '[]')
                         .filter(msg => !(msg.tempId && msg.id === data.message.sync_id))
                 ));
+                localStorage.setItem('tempAudioMessages', JSON.stringify(
+                    JSON.parse(localStorage.getItem('tempAudioMessages') || '[]')
+                        .filter(msg => !(msg.tempId && msg.id === data.message.sync_id))
+                ));
                 scrollToBottom();
-
             });
     };
     useEffect(() => {
         const storedTempMessages = JSON.parse(localStorage.getItem('tempMessages') || '[]');
-        console.log(storedTempMessages)
+        const storedTempAudioMessages = JSON.parse(localStorage.getItem('tempAudioMessages') || '[]');
         setTempMessages(storedTempMessages);
+        setTempAudioMessages(storedTempAudioMessages);
         setChat(prev => ({
             ...prev,
-            messages: Array.isArray(prev.messages) ? [...prev.messages, ...storedTempMessages] : storedTempMessages
+            messages: Array.isArray(prev.messages)
+                ? [...prev.messages, ...storedTempMessages, ...storedTempAudioMessages]
+                : [...storedTempMessages, ...storedTempAudioMessages]
         }));
 
         connectWebSocket();
@@ -271,15 +283,30 @@ export default function TicketChat() {
 
     //Audio message config
     const sendAudioMessage = async (audioBlob) => {
-        // Create a File object from the Blob
         const audioFile = new File([audioBlob], `voice_${Date.now()}.webm`, {type: audioBlob.type});
-
-        // Create a FormData object
         const formData = new FormData();
-
-        // Append the audio file to the FormData
         formData.append('audio', audioFile);
 
+        const tempId = Date.now();
+        const tempAudioMessage = {
+            tempId: tempId,
+            id: latestId,
+            type: 'audio',
+            is_sender: true,
+            time: new Date().toLocaleTimeString('fa-IR'),
+            day: new Date().toISOString(),
+            audio: URL.createObjectURL(audioBlob)
+        };
+
+        setTempAudioMessages(prev => [...prev, tempAudioMessage]);
+        setChat(prev => ({
+            ...prev,
+            messages: Array.isArray(prev.messages) ? [...prev.messages, tempAudioMessage] : [tempAudioMessage]
+        }));
+
+        // Save to local storage
+        const updatedTempAudioMessages = [...tempAudioMessages, tempAudioMessage];
+        localStorage.setItem('tempAudioMessages', JSON.stringify(updatedTempAudioMessages));
 
         try {
             const result = await TempFiles.mutateAsync(formData);
@@ -288,9 +315,11 @@ export default function TicketChat() {
             await sendMessage.mutateAsync({
                 audio: result,
                 type: "audio",
+                tempId: tempId
             });
 
             // Refetch messages after sending
+            scrollToBottom();
         } catch (error) {
             console.error('Error uploading audio file:', error);
             if (error.response) {
@@ -298,7 +327,6 @@ export default function TicketChat() {
             }
         }
     };
-
     //upload image
     async function handleChange(e) {
         const selectedFiles = Array.from(e.target.files);
@@ -307,26 +335,18 @@ export default function TicketChat() {
         for (const file of selectedFiles) {
             const formData = new FormData();
             formData.append('file', file);
+            setPreview({
+                file: file,
+                url: URL.createObjectURL(file),
+                type: file.type
+            });
+            setForm(formData)
             try {
                 const result = await TempFiles.mutateAsync(formData);
                 console.log('File uploaded successfully:', result);
-
-                // setFile(prevFiles => [
-                //     ...prevFiles,
-                //     {
-                //         file: file,
-                //         url: URL.createObjectURL(file),
-                //         tempId: result.id // Assuming the server returns an id for the temporary file
-                //     }
-                // ]);
-                setPreview({
-                    file: file,
-                    url: URL.createObjectURL(file),
-                    type:file.type
-                })
-
-                setValue("file", result)
-                setValue("type", file.type)
+                setSendImage(true);
+                setValue("file", result);
+                setValue("type", file.type);
             } catch (error) {
                 console.error('Error uploading file:', error);
                 // Handle error (e.g., show an error message to the user)
@@ -344,6 +364,8 @@ export default function TicketChat() {
     const handleCloseModal = () => {
         setSelectedImage(null);
         setPreview(null)
+        setSendImage(false)
+        setForm(null)
     };
 
     // const handleclear = (url) => {
@@ -385,6 +407,11 @@ export default function TicketChat() {
         const [hours, minutes] = time.split(':');
         return `${hours.replace(/\d/g, x => persianDigits[x])}:${minutes.replace(/\d/g, x => persianDigits[x])}`;
     };
+    const handleUpload = async () =>{
+       await TempFiles.mutateAsync(Form)
+        setUploading(false)
+    }
+
     return (
         <Box position="fixed" onKeyDown={handleKeyDown} dir="rtl" height="92vh"
              sx={{
@@ -419,20 +446,22 @@ export default function TicketChat() {
                     {/*    تيكت باز شده در{Messages?.data?.create}*/}
                     {/*</Typography>*/}
                     <Button disabled={ticketClose} onClick={() => closeTicket.mutate()} variant="contained"
-                            sx={{width: "10%", pl: 2, borderRadius: "20px",mr:1}}>
+                            sx={{width: {xs:'50%',lg:'10%'}, pl: 2, borderRadius: "20px",mr:1}}>
                         بستن تیکت
                     </Button>
                 </Box>
                 {/*<Divider sx={{mt: "10px"}}/>*/}
                 <Box display="flex" flexDirection="row" width="100%" gap={2}>
-                    <Box display="flex" boxShadow={3} bgcolor={theme.palette.Primary[20]} borderRadius="20px"
+                    <Box display="flex" boxShadow={3} bgcolor={theme.palette.Primary[20]}
+                         height={window.screen.height - 320}
+                         borderRadius="20px"
                          flexDirection="column" p={1} width={{xs: "100%", md: "60%"}}>
                         <Typography fontWeight="900">
                             {Messages?.data?.ticket_title}
                         </Typography>
                         {/*<Typography>آخرین آپدیت در{Messages?.data?.update}</Typography>*/}
                         <Box sx={{
-                            height: window.screen.height - 300,
+                            height: window.screen.height - 320,
                             overflowY: 'auto'
                         }}>
                             <Box width="100%" ref={chatBoxRef} display="flex" justifyContent="flex-end"
@@ -574,17 +603,22 @@ export default function TicketChat() {
                                             onClick={handleSubmit(onSubmit)}
                                             position="start"
                                         >
-                                            <IconButton disabled={ticketClose}>
+                                            <IconButton sx={{display:recorderControls.isRecording ? 'none' : 'block'}} disabled={ticketClose}>
                                                 <SendIcon/>
                                             </IconButton>
                                         </InputAdornment>
                                         <AudioRecorder
-                                            onRecordingComplete={sendAudioMessage}
+                                            onRecordingComplete={(blob) => {
+                                                sendAudioMessage(blob);
+                                            }}
                                             audioTrackConstraints={{
                                                 noiseSuppression: true,
                                                 echoCancellation: true,
                                             }}
-                                            onNotAllowedOrFound={(err) => console.table(err)}
+                                            onNotAllowedOrFound={(err) => {
+                                                console.table(err)
+                                            }}
+                                            recorderControls={recorderControls}
                                             mediaRecorderOptions={{
                                                 audioBitsPerSecond: 128000,
                                             }}
@@ -612,8 +646,11 @@ export default function TicketChat() {
                                             }}
                                         >
                                             <MenuItem sx={{padding: 0}} disabled={ticketClose}>
-                                                <EmojiPicker height={500}
-                                                             onEmojiClick={onClickShowEmoji}/>
+                                                <EmojiPicker
+                                                    height={500}
+                                                    onEmojiClick={onClickShowEmoji}
+                                                    autoFocusSearch={false}
+                                                />
                                             </MenuItem>
                                         </Menu>
                                         <Box height="100%" display="flex" alignItems="center">
@@ -632,12 +669,13 @@ export default function TicketChat() {
                         ></TextField>
                     </Box>
                     <Box width="38%" boxShadow={3} bgcolor={theme.palette.Primary[20]} borderRadius="20px"
+                         height={window.screen.height - 320}
                          display={{xs: "none", md: "flex"}} alignItems="start" flexDirection='column' p={1}>
                         <Typography fontWeight="900" mt={2}>جزییات</Typography>
                         <Divider sx={{mt: "10px"}}/>
                         <Typography mt={2} fontWeight="500">فایل های پیوست</Typography>
                         <Box display="flex" gap={2} flexDirection="column" width="463px" sx={{
-                            height: window.screen.height - 300,
+                            height: window.screen.height - 320,
                             overflowY: 'auto'
                         }}>
                             {file?.map((item, index) =>
@@ -777,17 +815,33 @@ export default function TicketChat() {
                                 </Typography>
 
                             }
-                                <IconButton onClick={handleSubmit(onSubmit)}
-                                            sx={{
-                                                backgroundColor: "#E0E0E0", // Added a background color
-                                                '&:hover': {
-                                                    backgroundColor: "#D0D0D0", // Darker shade on hover
-                                                },
-                                                padding: "12px", // Increased padding for a larger button
-                                            }}
-                                >
-                                    <SendIcon sx={{fontSize: "1.5rem"}}/> {/* Increased icon size */}
-                                </IconButton>
+                                {sendImage ?
+                                    <IconButton onClick={handleSubmit(onSubmit)}
+                                                sx={{
+                                                    backgroundColor: "#E0E0E0", // Added a background color
+                                                    '&:hover': {
+                                                        backgroundColor: "#D0D0D0", // Darker shade on hover
+                                                    },
+                                                    padding: "12px", // Increased padding for a larger button
+                                                }}
+                                    >
+                                        <SendIcon sx={{fontSize: "1.5rem"}}/> {/* Increased icon size */}
+                                    </IconButton>
+                                    :
+                                    uplodaing ?
+                                        <>
+                                        <Typography>
+                                            بارگزاری با مشکل مواجه شد
+                                        </Typography>
+                                        <IconButton onClick={handleUpload}>
+                                            <FolderIcon/>
+                                        </IconButton>
+                                        </>
+                                        :
+                                   <Typography>
+                                       لطفا صبر کنید
+                                   </Typography>
+                                }
                             </Box>
                         </Modal>
                         <Modal
@@ -811,6 +865,7 @@ export default function TicketChat() {
                                 <EmojiPicker
                                     height={400}
                                     width={350}
+                                    autoFocusSearch={false}
                                     onEmojiClick={(emojiData, event) => {
                                         onClickShowEmoji(emojiData, event);
                                         // closeEmojiModal();
