@@ -8,10 +8,27 @@ use App\Http\Resources\Api\User\TransactionResource;
 use App\Http\Resources\Api\User\WalletResource;
 use App\Models\Transaction;
 
+/**
+ * @OA\Info(title="Kargozareman", version="0.1")
+ */
 class TransactionController
 {
     /**
      * Display a listing of the resource.
+     */
+    /**
+     * @OA\Get(
+     *     path="/api/web/v1/user/transaction-list",
+     *     @OA\Response(response="200", description="An example resource"),
+     *  @OA\Parameter(
+     *          name="Accept",
+     *          in="header",
+     *          required=true,
+     *          @OA\Schema(
+     *              type="string",
+     *              default="application/json"
+     *          ))
+     * ),
      */
     public function index()
     {

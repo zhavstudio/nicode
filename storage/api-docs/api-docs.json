@@ -1,0 +1,48 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Kargozareman",
+        "version": "0.1"
+    },
+    "paths": {
+        "/api/web/v1/user/transaction-list": {
+            "get": {
+                "operationId": "c92fdf68d4e28c84a08613d5b049db10",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An example resource"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "sanctum": {
+                "type": "apiKey",
+                "description": "Enter token in format (<token>)",
+                "name": "Token",
+                "in": "header"
+            }
+        }
+    },
+    "security": [
+        {
+            "sanctum": [
+                "read",
+                "write"
+            ]
+        }
+    ]
+}

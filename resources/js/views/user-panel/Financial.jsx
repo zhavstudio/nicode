@@ -82,6 +82,7 @@ const NumericFormatCustom = React.forwardRef(
 export default function Financial() {
 
     const [page, setPage] = React.useState(0);
+    const [disable, setDisable] = React.useState(true);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const [open, setOpen] = React.useState(false);
     const [searchTerm, setSearchTerm] = React.useState('');
@@ -191,19 +192,24 @@ export default function Financial() {
     });
 
     const postTransaction = useMutation('postTransaction', async(data)=>{
+        setDisable(false);
         const response =  await axios.post(
             route("api.web.v1.user.transaction", {}, 1), data
         );
         // Check if the response contains an HTML page
         if (response.headers['content-type'].includes('text/html')) {
             // Open a new window or tab with the received HTML page
-            const paymentPageWindow = window.open('', '_blank');
+            const paymentPageWindow = window.open('', '_self');
             paymentPageWindow.document.write(response.data);
         } else {
             // Handle the response as needed (e.g., display success/error messages)
             console.log(response.data);
         }
 
+    },{
+        onSuccess:()=>{
+
+        }
     })
 
     //modal handling
@@ -313,7 +319,7 @@ export default function Financial() {
                                     sx={{width: "100%", marginBottom: 2}}/>
                                 {watch('amount') !== '' && <Typography style={{marginBottom:20}}>{numberToWords(watch('amount'))}</Typography>}
 
-                                <Button type="submit" disabled={!isValid}
+                                <Button type="submit" disabled={!(disable && isValid)}
                                     sx={{borderRadius: "10px", bgcolor: theme.palette.Secondary.main, width: "100%"}}
                                     variant="contained">پرداخت</Button>
                             </Box>
