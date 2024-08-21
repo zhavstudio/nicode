@@ -82,6 +82,7 @@ class User extends Authenticatable implements LaratrustUser
             'phone_number_verified_at' => 'datetime',
             'status'                   => UserStatusEnum::class,
             'email'                    => 'string',
+            'fcm_token',
         ];
     }
 
@@ -157,5 +158,10 @@ class User extends Authenticatable implements LaratrustUser
     public function wallet(): HasOne
     {
         return $this->hasOne(Wallet::class);
+    }
+    public function updateFcmToken($token)
+    {
+        $this->fcm_token = $token;
+        $this->save();
     }
 }
