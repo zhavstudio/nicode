@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->ulid('id')->autoIncrement();
-            $table->decimal('amount', 8, 2);
+            $table->integer('amount');
             $table->string('transactionID');
             $table->string('referenceID')->nullable();
             $table->tinyInteger('status')->default(TransactionStatusEnum::pending);

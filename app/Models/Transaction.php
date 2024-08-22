@@ -58,7 +58,6 @@ class Transaction extends Model
      * @return array
      */
     protected $casts = [
-//        'amount'      => 'decimal',
             'status'    => TransactionStatusEnum::class
     ];
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Admin\TransactionController;
 use App\Http\Controllers\Api\Admin\UserController;
 
 use App\Http\Controllers\Api\Admin\MessageController;
+use App\Http\Controllers\Api\Admin\WalletController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\TempController;
 use Illuminate\Support\Facades\Route;
@@ -43,5 +44,6 @@ Route::name("api.web.v1.admin.")->group(function () {
 
     Route::apiResource("temporary-file", TempController::class)->only("store");
 
+    Route::apiResource('wallet/update/user', WalletController::class)->only('update');
 
 });

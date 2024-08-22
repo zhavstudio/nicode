@@ -24,7 +24,7 @@ class TransactionObserver
             $wallet = $transaction->wallet;
             $amount = $transaction->amount >= 0 ? $transaction->amount : -$transaction->amount;
 
-            $wallet->total += floatval($amount);
+            $wallet->total += $amount;
             $wallet->save();
         }
     }

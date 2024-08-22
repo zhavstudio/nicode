@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('wallets', function (Blueprint $table) {
             $table->ulid('id')->autoIncrement();
-            $table->decimal('total', 8, 2);
+            $table->integer('total');
             $table->foreignIdFor(User::class);
             $table->timestamps();
         });

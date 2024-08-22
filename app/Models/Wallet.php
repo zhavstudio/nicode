@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\TransactionStatusEnum;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -57,7 +56,7 @@ class Wallet extends Model
      * @return array
      */
     protected $casts = [
-//        'total'      => 'decimal',
+        'total'      => 'integer',
     ];
 
     public function user(): BelongsTo
@@ -70,10 +69,4 @@ class Wallet extends Model
         return $this->hasMany(Transaction::class)->latest();
     }
 
-    public function getTotalSuccessfulTransactionsAttribute()
-    {
-        return $this->transactions()
-            ->where('status', TransactionStatusEnum::success)
-            ->sum('amount');
-    }
 }

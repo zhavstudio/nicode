@@ -5,6 +5,120 @@
         "version": "0.1"
     },
     "paths": {
+        "/api/web/v1/admin/wallet/update/user/{user}": {
+            "put": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Update the user's wallet balance",
+                "description": "Add or subtract an amount from the user's wallet based on the method provided ('add' or 'minus').",
+                "operationId": "updateUserWallet",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        }
+                    },
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "method",
+                        "in": "query",
+                        "description": "The method to use: 'add' to add the amount, 'minus' to subtract the amount",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "add",
+                                "minus"
+                            ],
+                            "example": "add"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "amount": {
+                                        "description": "The amount to add or subtract",
+                                        "type": "number",
+                                        "example": 100
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Wallet updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total": {
+                                            "description": "The updated total amount in the wallet",
+                                            "type": "number"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "405": {
+                        "description": "Insufficient balance to subtract the amount",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "موجودی کافی نیست"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/web/v1/user/transaction-list": {
             "get": {
                 "operationId": "c92fdf68d4e28c84a08613d5b049db10",
@@ -27,6 +141,12 @@
             }
         }
     },
+    "tags": [
+        {
+            "name": "Wallet",
+            "description": "Wallet"
+        }
+    ],
     "components": {
         "securitySchemes": {
             "sanctum": {
