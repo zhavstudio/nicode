@@ -498,7 +498,7 @@ export default function TicketChat() {
                                                             }}
                                                         >
                                                             <Typography
-                                                                bgcolor={item.is_sender ? "gray" : "white"}
+                                                                bgcolor={item.is_sender ? "#EEEFFF" : "white"}
                                                                 borderRadius="20px"
                                                                 width="100%"
                                                                 display="flex"
@@ -524,11 +524,12 @@ export default function TicketChat() {
                                                         {!item.is_sender && <Typography mt={2.5} fontSize={10}
                                                                                         color="gray">{toPersianNumber(item.time)}</Typography>}
                                                         <Typography
-                                                            bgcolor={item.is_sender ? theme.palette.Primary[30] : "white"}
+                                                            bgcolor={item.is_sender ? "#EEEFFF" : "white"}
                                                             borderRadius="20px"
                                                             maxWidth="50%"
                                                             p={1}
                                                             mt={1}
+                                                            px={2}
                                                             style={{
                                                                 wordBreak: 'break-word',
                                                             }}
@@ -566,7 +567,7 @@ export default function TicketChat() {
                                     },
                                     mt: 2,
                                     pl: 5,
-                                    backgroundColor: theme.palette.Primary[30], borderRadius: '20px',
+                                    backgroundColor: "white", borderRadius: '20px',
                                     boxShadow: {xs: 3, md: 0},
                                     width: {xs: "100%", md: "97%"}
                                 },

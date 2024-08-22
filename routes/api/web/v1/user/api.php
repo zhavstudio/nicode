@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\User\TransactionController;
+use App\Http\Controllers\FcmController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TempController;
 use Illuminate\Support\Facades\Route;
@@ -49,5 +50,6 @@ Route::name("api.web.v1.user.")->group(function () {
 
     Route::apiResource("temporary-file", TempController::class)->only("store");
 
+    Route::post('fcm-token', [FcmController::class, 'updateFcmToken'])->name('fcm-token');
 
 });

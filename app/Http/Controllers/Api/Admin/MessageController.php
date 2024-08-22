@@ -13,6 +13,8 @@ use App\Models\Ticket;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Laravel\Firebase\Facades\Firebase;
 use Morilog\Jalali\CalendarUtils;
 
 class MessageController
@@ -144,10 +146,30 @@ class MessageController
 
         SendMessage::dispatch($ticketRecord,$penultimateMessageId);
         Ticket::where('id', $ticket->id)->touch();
+        $this->sendFirebaseNotification($ticket,$ticketRecord->text);
 
         return response()->json([
             'success' => true,
             'message' => "Message created and job dispatched.",
         ]);
+    }
+
+    private function sendFirebaseNotification(Ticket $ticket,$messages)
+    {
+        $user = $ticket->user;
+        $fcmToken = $user->fcm_token; // Assuming you store the FCM token in the user model
+        if ($fcmToken) {
+            $message = CloudMessage::withTarget('token', $fcmToken)
+                ->withNotification([
+                    'title' => 'پیام شما پاسخ داده شد',
+                    'body' => $messages,
+                    'icon' => asset('storage/icon/logo.svg')
+                ])
+                ->withData([
+                    'ticket_id' => $ticket->id,
+                ]);
+
+            Firebase::messaging()->send($message);
+        }
     }
 }

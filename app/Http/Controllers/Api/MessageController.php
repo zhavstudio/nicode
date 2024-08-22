@@ -145,14 +145,5 @@ class MessageController
         ]);
     }
 
-    public function sendNotification(FirebaseServiceProvider $firebaseService)
-    {
-        $token = 'user_fcm_token';
-        $title = 'Notification Title';
-        $body = 'Notification Body';
-        $data = ['key' => 'value']; // Optional
-
-        $firebaseService->sendNotification($token, $title, $body, $data);
-    }
 
 }
